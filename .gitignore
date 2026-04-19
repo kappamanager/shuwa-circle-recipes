@@ -1,0 +1,19 @@
+# データファイル（リポジトリには含めない）
+activities.xlsx
+*.xlsx
+~$*.xlsx
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS / エディタ
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# バックアップ・テスト
+*.bak
+test_*.xlsx

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手話サークルの企画レシピ</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: #F5F2ED;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 400;
+    color: #2A2A2A;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: #B8533E; color: #fff; }
+
+  /* Layout */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 32px; }
+  header { padding: 72px 0 48px; }
+  header h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 40px; font-weight: 800;
+    line-height: 1.3; letter-spacing: -0.5px;
+    margin-bottom: 20px;
+  }
+  .header-desc { font-size: 14px; line-height: 2.2; color: #555; max-width: 500px; }
+  .header-desc p { margin-bottom: 8px; }
+  .header-desc a { color: #B8533E; border-bottom: 1px solid #B8533E; text-decoration: none; }
+  .header-desc a:hover { opacity: 0.7; }
+  .header-line {
+    width: 48px; height: 1px; background: #2A2A2A; margin-top: 36px;
+    animation: revealLine 0.6s ease 0.2s both; transform-origin: left;
+  }
+
+  /* Filters */
+  .filters { padding-bottom: 40px; }
+  .filter-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .filter-label { font-size: 11px; color: #888; font-weight: 500; letter-spacing: 1px; min-width: 44px; flex-shrink: 0; }
+  .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag-btn {
+    border: 1px solid #CCC; background: none; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 400;
+    padding: 5px 14px; border-radius: 2px; transition: all 0.15s; color: #666;
+  }
+  .tag-btn:hover { border-color: #888; color: #2A2A2A; }
+  .tag-btn.active { border-color: #2A2A2A; color: #2A2A2A; font-weight: 500; background: rgba(42,42,42,0.04); }
+  .reset-btn {
+    border: none; background: none; cursor: pointer;
+    font-size: 12px; color: #B8533E; font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 400; padding: 0; border-bottom: 1px solid #B8533E; margin-top: 16px;
+    display: none;
+  }
+  .reset-btn.visible { display: inline; }
+
+  /* Count */
+  .count { font-size: 12px; color: #888; padding-bottom: 12px; }
+
+  /* Entries */
+  .entry {
+    animation: fadeUp 0.4s ease both;
+  }
+  .entry-row {
+    border-top: 1px solid #DDD; padding: 28px 48px 28px 0;
+    cursor: pointer; transition: background 0.12s; position: relative;
+  }
+  .entry-row:hover { background: rgba(42,42,42,0.02); }
+  .entry-title-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  .entry-title {
+    font-family: 'Shippori Mincho', serif; font-size: 22px; font-weight: 600;
+    letter-spacing: 0.5px; transition: color 0.15s;
+  }
+  .entry-title.open { color: #B8533E; }
+  .entry-meta { display: flex; gap: 12px; font-size: 11px; color: #888; font-weight: 400; flex-wrap: wrap; }
+  .entry-meta .sep { color: #DDD; }
+  .entry-meta .prep-tag { color: #B8533E; }
+  .entry-catch { font-size: 13px; line-height: 1.9; color: #666; margin-top: 8px; }
+
+  /* Ribbon */
+  .ribbon {
+    position: absolute; right: 0; top: -1px;
+    width: 24px; height: 52px;
+    border-radius: 0 0 3px 3px;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 6px;
+  }
+  .ribbon span {
+    writing-mode: vertical-rl; font-size: 9px; font-weight: 700;
+    color: #fff; letter-spacing: 2px;
+  }
+  .ribbon-cut {
+    position: absolute; right: 0; top: 51px;
+    width: 0; height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+  }
+
+  /* Detail panel */
+  .detail-panel {
+    padding: 20px 24px 32px 24px;
+    border-left: 2px solid #B8533E;
+    background: rgba(42, 42, 42, 0.025);
+    margin-left: -1px; margin-right: -1px;
+    animation: fadeUp 0.3s ease;
+    display: none;
+  }
+  .detail-panel.open { display: block; }
+  .detail-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    color: #B8533E; margin-bottom: 6px;
+  }
+  .detail-text { font-size: 13px; line-height: 2; color: #444; margin-bottom: 20px; }
+  .detail-text ul {
+    margin: 0; padding-left: 16px; line-height: 2.2; list-style-type: '・';
+  }
+  .detail-text ol {
+    margin: 0; padding-left: 24px; line-height: 2.2; list-style-type: decimal;
+  }
+  .detail-text li { padding-left: 4px; }
+  .schedule-step { display: flex; gap: 12px; line-height: 2; }
+  .schedule-num { color: #AAA; min-width: 20px; text-align: right; }
+  .schedule-time { color: #AAA; }
+
+  /* Empty state */
+  .empty { color: #AAA; font-size: 14px; padding: 48px 0; border-top: 1px solid #DDD; }
+
+  /* Footer */
+  footer { border-top: 1px solid #DDD; padding: 32px 0 48px; }
+  footer p { font-size: 11px; color: #CCC; letter-spacing: 3px; font-weight: 400; }
+
+  /* Animations */
+  @keyframes revealLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    header h1 { font-size: 28px; }
+    .ribbon { width: 20px !important; height: 44px !important; }
+    .ribbon span { font-size: 8px !important; }
+    .ribbon-cut { top: 43px !important; border-left-width: 10px !important; border-right-width: 10px !important; border-top-width: 6px !important; }
+    .entry-row { padding-right: 36px !important; }
+    .entry-title { font-size: 18px; }
+  }
+
+  @media print {
+    .filters, .reset-btn, .count { display: none !important; }
+    .entry-row { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <header>
+    <h1>手話サークルの企画レシピ</h1>
+    <div class="header-desc">
+      <p>手話サークルでどんな企画をしたらいいか分からない。</p>
+      <p>そんな悩みに応えて各地から企画案を集めてみました。</p>
+      <p>新しい案を掲載したい方は<a href="#">こちら</a>からご連絡ください。</p>
+    </div>
+    <div class="header-line"></div>
+  </header>
+
+  <!-- Filters -->
+  <nav class="filters" id="filters"></nav>
+
+  <!-- Count -->
+  <div class="count" id="count"></div>
+
+  <!-- Entries -->
+  <main id="entries"></main>
+
+  <!-- Footer -->
+  <footer>
+    <p>手話サークルの企画レシピ</p>
+  </footer>
+</div>
+
+<script>
+// ─── Data ───────────────────────────────────────────────
+const ACTIVITIES = [
+  {id:1,title:"積み木自己紹介",catch:"記憶力×自己紹介。アイスブレイクの定番。",major:"交流系",minor:"アイスブレイク",time:"〜15分",people:"6〜15人",diff:"やさしい",prep:"不要",purpose:"初対面のメンバー同士が名前と顔を一致させること",design:["前の人を紹介してから自分を名乗る形式にすることで、相手の話を注意深く見る動機が生まれる","人数が増えると記憶の負荷が上がるので適度な緊張感も出る","紹介項目もゲーム難易度の調整だと考えると増やしやすい"],flow:["円になって座る","1人目が手話で自己紹介する（名前＋一言）","2人目は1人目を紹介してから自分を名乗る","3人目は1人目・2人目を紹介してから自分を名乗る","これを人数分繰り返し、一周するまで続ける"],schedule:{total:"20分",steps:[{label:"ルール説明・スタッフ例",min:"5分"},{label:"自己紹介リレー1周",min:"10分"},{label:"振り返り",min:"5分"}]},tips:["5〜6人で1グループにすると記憶の負担が適度。","自己紹介項目に手話ネームなどを含めると今後の交流に生かせるかも。"],materials:"特になし"},
+  {id:2,title:"共通点を見つけよう",catch:"大人数でのチーム分けをするときに使える企画。",major:"交流系",minor:"アイスブレイク",time:"〜15分",people:"16人〜",diff:"やさしい",prep:"不要",purpose:"自己紹介×チーム分けをすること",design:"「共通点を探す」という目的をベースで自己紹介をスムーズに実施できる",flow:["共通点カードを配る(食べ物カード「うどん」「ラーメン」など)","制限時間内で歩き回る","一人一人と自己紹介して相手のカードを尋ねる","一致した人とチームになる","チームが結成出来たらその場でトーク","制限時間になったら終了"],schedule:{total:"15分",steps:[{label:"カード配布+ルール説明",min:"5分"},{label:"ペアで共通点探し(参加人数により時間変動)",min:"10分"}]},tips:["あくまでチーム分け用の企画なので大人数の交流会における最初の企画などに向いている","初心者の動向を注意深く見守り、いつでもサポートできるようにしておくとよい"],materials:"共通点カード"},
+  {id:3,title:"指文字しりとり",catch:"指文字を覚えるための初心者向けゲーム",major:"交流系",minor:"ゲーム",time:"〜15分",people:"人数不問",diff:"やさしい",prep:"不要",purpose:"指文字を覚えること",design:["誰でも知っている「しりとり」を使うことでルール説明を簡略化したゲーム体験ができる","とにかく指文字を表す、読み取ることで身に着ける"],flow:["チームで別れて円になる","スタッフが最初の文字を発表","最初の文字から始まる単語を指文字で表現する","次の人はその単語の最後の文字から始まる単語を指文字で表現する","制限時間内で繰り返し"],schedule:{total:"15分",steps:[{label:"ルール説明",min:"3分"},{label:"1周目（食べ物縛りなど）",min:"5分"},{label:"2周目（テーマ変更）",min:"5分"},{label:"振り返り",min:"2分"}]},tips:["「食べ物縛り」「動物縛り」でテーマを絞ると単語を決めやすくなる","声なしにすると読み取り勉強にもなる","出せた単語数でチーム対抗にするとモチベーションにもなるかも"],materials:"特になし"},
+  {id:4,title:"歯車トーク",catch:"1対1のトークを繰り返す純度高めなトーク企画",major:"交流系",minor:"トーク",time:"〜1時間",people:"6〜15人",diff:"やさしい",prep:"不要",purpose:"複数の相手と1対1でじっくり話すこと",design:["歯車の回転のように会話相手が変わっていくので複数人の相手と話せる","1対1なので置いていかれづらい"],flow:["椅子を2列に向かい合わせて並べて座る","一定時間、目の前の相手と手話で会話する","一定時間経過したら片側の列が1席ずつ移動する","新しい相手と会話する","これを繰り返す"],schedule:{total:"40分",steps:[{label:"ルール説明",min:"5分"},{label:"会話①",min:"10分"},{label:"会話②",min:"10分"},{label:"会話③",min:"10分"},{label:"まとめコメント",min:"5分"}]},tips:["初心者がいる場合は企画担当者が付いてサポートするとよい","まとめコメントで新しく覚えた手話などを司会から共有すると勉強にもなる"],materials:"特になし"},
+  {id:5,title:"ジェスチャーゲーム",catch:"手話を使わずジェスチャーだけで伝える。違いを体感しつつ初心者も参加しやすい形式に。",major:"交流系",minor:"ゲーム",time:"〜15分",people:"6〜15人",diff:"やさしい",prep:"必要",purpose:"ジェスチャーと手話の違いを体感すること\n非言語コミュニケーションへの意識を高めること",design:["あえて手話禁止にすることで、普段の手話表現がいかに体系的・効率的かを逆説的に理解できる。","あえて手話禁止にすることでレベル差によらない交流が生まれる。"],flow:["チーム分け","回答者1名を決める","回答者1名のみ反対側を向き、出題者たちは順番にスタッフの出したお題をジェスチャーで表現","制限時間内に何問正解できたをカウント","数回繰り返し、最も正解数が多いチームが優勝"],schedule:{total:"15分",steps:[{label:"ルール説明・チーム分け",min:"3分"},{label:"出題ラウンド",min:"10分"},{label:"手話との比較トーク",min:"2分"}]},tips:"ルールに声なしを含めておくと聞こえ・手話練度による交流の断絶が発生しづらい",materials:"お題カード"},
+  {id:6,title:"伝言ゲーム",catch:"さまざまなコミュニケーション方法で意思疎通を図ろう！",major:"交流系",minor:"その他",time:"〜15分",people:"人数不問",diff:"ふつう",prep:"不要",purpose:"非音声コミュニケーション方法を認知すること",design:"手話以外のコミュニケーションを複数回×複数種類試すことで知識だけではなく経験とセットで覚えられる",flow:["チーム分け","1列に並ぶ","スタッフがコミュニケーション方法を発表","スタッフが先頭の人にテーマを伝える","最後尾の人が伝わった内容を発表","答え合わせ","繰り返し"],schedule:{total:"30分",steps:[{label:"ルール説明",min:"3分"},{label:"テーマ①「指文字」",min:"8分"},{label:"テーマ②「空書」",min:"8分"},{label:"テーマ③「口話」",min:"8分"},{label:"まとめコメント",min:"3分"}]},tips:"最初にコミュニケーション方法を説明しておくとよい(指文字、空書、口話、ジェスチャー、キュード、触手話など)",materials:"特になし"},
+  {id:7,title:"手話プレゼンバトル",catch:"お題について手話で2分間プレゼン。表現力の総合格闘技",major:"学習系",minor:"表現練習",time:"〜1時間",people:"6〜15人",diff:"しっかり",prep:"必要",purpose:"構成力・表現力・即興力を総合的に磨くこと",design:["1分という制限が「何を伝え、何を捨てるか」の判断を迫る","投票制にすることで、伝わったかどうかの客観的フィードバックが得られる"],flow:["チーム分け","お題を発表（例：「おすすめの映画」「無人島に持っていく3つ」）","チーム内で発表者+発表内容を相談","1人ずつ2分間の手話プレゼン","聴衆が「わかりやすさ」「面白さ」「表現力」で投票","結果発表＆講評"],schedule:{total:"60分",steps:[{label:"ルール説明",min:"5分"},{label:"準備",min:"15分"},{label:"プレゼン＋投票",min:"30分"},{label:"結果発表・振り返り",min:"10分"}]},tips:["初心者が参加する場合は準備時間を長くするとよい","投票はMentimeter等のアプリを使うとリアルタイムに盛り上がる","スタッフは30秒程度のバージョンで例を出すとよい"],materials:"タイマー、投票用紙 or アプリ"},
+  {id:8,title:"手話動画クイズ",catch:"手話動画の内容を読み取って答えるクイズ",major:"学習系",minor:"読取練習",time:"〜30分",people:"人数不問",diff:"ふつう",prep:"必要",purpose:"読取力を鍛えること",design:"動画素材を使うことで、生の手話に近い速度・表現に触れられる。クイズ形式にすることで「正確に読み取ろう」という集中力が生まれる。",flow:["プロジェクターで手話動画を再生","手話動画に基づいたクイズを出題","クイズの答えを相談","正解発表","解説（どの表現がポイントだったか）"],schedule:{total:"30分",steps:[{label:"説明",min:"3分"},{label:"初級問題×3",min:"10分"},{label:"中級問題×2",min:"10分"},{label:"上級問題×1",min:"7分"}]},tips:["難易度別に用意すると参加のハードルが下がる","受動的な企画になりやすいので答えを相談しやすいお題設計が重要"],materials:"プロジェクター、PC、手話動画（事前編集）"},
+  {id:9,title:"CL表現お絵描き対決",catch:"CL表現=空間描写能力でチャレンジ",major:"学習系",minor:"文法",time:"〜30分",people:"6〜15人",diff:"しっかり",prep:"必要",purpose:"CLによる空間表現の理解を深めること\n見たものを正確に解釈する力を育てること",design:["絵に描くというアウトプットを課すことで、CLの読み取りが「なんとなく分かった」で終わらず、正確な理解が求められる。","絵を描かせるという目的を課すことで自分のCL表現が「どれくらい分かりやすいか」を確認できる"],flow:["CLの簡単な説明（初回のみ）","出題者がCLで形状・動きを表現","回答者がそれを見て絵を描く","絵と正解を比較","解説＆ポイント共有"],schedule:{total:"30分",steps:[{label:"CLの説明",min:"5分"},{label:"練習問題",min:"10分"},{label:"本番",min:"10分"},{label:"振り返り",min:"5分"}]},tips:["最初にCL説明を導入することが重要","「車が坂を上る」レベルの練習問題から始めるとよい","解説なしだと単なるイラスト遊びに終始しやすいので解説部分が重要"],materials:"ホワイトボード or 紙、マーカー、お題となるイラスト"},
+  {id:10,title:"謎解きゲーム",catch:"5つの謎を解いて鍵の番号を当て、宝箱を開ける参加型謎解き",major:"交流系",minor:"ゲーム",time:"〜1時間",people:"16人〜",diff:"しっかり",prep:"必要",purpose:"ジェスチャー・選択肢クイズ・手話表現の読み取りなど多様な謎を通して参加者全員が協力する一体感を作ること",design:["5問の謎を順に出題し、各問の正解の文字を集めると鍵の番号が完成する設計","謎の種類（ジェスチャー、ASL手話、手話分類クイズ、なぞなぞ等）を意図的にバラけさせ、誰かしらが活躍できる場面を作る","正解した謎のみヒント文字が獲得できるルールで集中力を維持"],flow:["チーム分け","スタッフが世界観を説明（閉じ込められた！鍵を隠した、など）","謎①〜⑤に順番に挑戦（ジェスチャーで答える、選択肢から選ぶ、手話単語の意味当てなど）","各問正解時のみヒントとして鍵番号の1文字を公開","挑戦し終わったら取得したヒントをもとに相談","鍵を見つけられたらゲームクリア"],schedule:{total:"60分",steps:[{label:"導入説明",min:"5分"},{label:"謎①〜⑤に挑戦",min:"30分"},{label:"場所推理・捜索",min:"15分"},{label:"脱出成功したか！？",min:"10分"}]},tips:["謎コーナーはミニゲームのイメージでブースのように部屋の各所に設置する","ミニゲーム内での手話難易度をバラバラにすることが重要"],materials:"鍵的な物体、各ミニゲーム"},
+  {id:11,title:"魂の単語合戦",catch:"テーマに沿う手話単語を出し合うグループ対抗単語数バトル",major:"学習系",minor:"表現練習",time:"〜30分",people:"6〜15人",diff:"ふつう",prep:"不要",purpose:"語彙数を強化すること",design:["とにかく単語数が企画内で上昇するような形に設計する","同じ単語を出せない制約を課すことによって珍しい単語を出そうとする工夫も引き出す"],flow:["チーム分け","お題（食べ物の手話／パーの形の手話／動物の手話など）を発表","5分間で出した単語をメモに書く（表し方も全員で確認）","対戦グループと交代で1単語ずつ出し合う（同じ単語は出せない）","多くの単語を出したグループが勝ち","お題を変えて繰り返す"],schedule:{total:"45分",steps:[{label:"説明・スタッフ例",min:"5分"},{label:"お題①（相談8分＋対戦7分）",min:"15分"},{label:"お題②",min:"15分"},{label:"まとめ+珍しかった単語を取り上げ",min:"10分"}]},tips:["「手の形」（パー、チョキ、指文字「い」など）と「カテゴリ」（食べ物、動物、顔に触れる手話など）の2系統で切り口を用意","相談時に表現を全員で確認する時間を必ず取ると初心者も置いていかれない","単語を出し合うときも指文字を忘れずに。できれば一つ一つホワイトボードに書かれていることが望ましい。"],materials:"メモ用紙"},
+  {id:12,title:"すごろくゲーム",catch:"お題マスで手話表現にチャレンジしながら進むグループすごろく",major:"交流系",minor:"ゲーム",time:"〜30分",people:"6〜15人",diff:"やさしい",prep:"必要",purpose:"ゆったりと交流するための非競争型企画",design:"「競わない・のんびり進める」という方針で勝敗ではなく交流を主目的にする",flow:["チーム分け","すごろくセットを配布","止まったマスのお題（手話で文章を表す・なぞなぞ・早口言葉など）に挑戦","制限時間まで継続"],schedule:{total:"30分",steps:[{label:"ルール説明",min:"3分"},{label:"すごろく進行",min:"25分"},{label:"まとめコメント",min:"2分"}]},tips:"お題例：「好きな食べ物を手話表現しよう」「となりの人の名前を指文字で表現しよう」「スタッフの指文字を読み取ろう」「じゃんけんして負けたら1マス戻る」「1分以内にテの形の手話を5つ表現しよう」などなど",materials:"すごろくセット"},
+];
+
+const MINORS = {
+  "交流系": ["アイスブレイク","ゲーム","トーク","その他"],
+  "学習系": ["表現練習","読取練習","文法","その他"],
+};
+const TIMES = ["〜15分","〜30分","〜1時間"];
+const PEOPLES = ["〜5人","6〜15人","16人〜","人数不問"];
+const DIFFS = ["やさしい","ふつう","しっかり"];
+const PREPS = ["不要","必要"];
+const DIFF_COLORS = {"やさしい":"#7A9B7E","ふつう":"#C4944A","しっかり":"#B8533E"};
+
+// ─── State ──────────────────────────────────────────────
+let filters = { major:null, minor:null, time:null, people:null, diff:null, prep:null };
+let openId = null;
+
+// ─── Render ─────────────────────────────────────────────
+function render() {
+  renderFilters();
+  renderEntries();
+}
+
+function renderFilters() {
+  const nav = document.getElementById('filters');
+  let html = '';
+  html += filterRow('分類', ['交流系','学習系'].map(v => tagBtn(v, 'major')).join(''));
+  if (filters.major) {
+    html += filterRow('種別', MINORS[filters.major].map(v => tagBtn(v, 'minor')).join(''));
+  }
+  html += filterRow('時間', TIMES.map(v => tagBtn(v, 'time')).join(''));
+  html += filterRow('人数', PEOPLES.map(v => tagBtn(v, 'people')).join(''));
+  html += filterRow('難易度', DIFFS.map(v => tagBtn(v, 'diff')).join(''));
+  html += filterRow('準備', PREPS.map(v => tagBtn(v, 'prep')).join(''));
+  const hasFilter = Object.values(filters).some(v => v !== null);
+  html += `<button class="reset-btn ${hasFilter ? 'visible' : ''}" onclick="clearFilters()">絞り込みをリセット</button>`;
+  nav.innerHTML = html;
+}
+
+function filterRow(label, btns) {
+  return `<div class="filter-row"><span class="filter-label">${label}</span><div class="filter-group">${btns}</div></div>`;
+}
+
+function tagBtn(value, key) {
+  const active = filters[key] === value ? ' active' : '';
+  return `<button class="tag-btn${active}" onclick="toggleFilter('${key}','${value}')">${value}</button>`;
+}
+
+function toggleFilter(key, value) {
+  if (filters[key] === value) { filters[key] = null; }
+  else { filters[key] = value; }
+  if (key === 'major') filters.minor = null;
+  openId = null;
+  render();
+}
+
+function clearFilters() {
+  filters = { major:null, minor:null, time:null, people:null, diff:null, prep:null };
+  openId = null;
+  render();
+}
+
+function getFiltered() {
+  return ACTIVITIES.filter(a => {
+    if (filters.major && a.major !== filters.major) return false;
+    if (filters.minor && a.minor !== filters.minor) return false;
+    if (filters.time && a.time !== filters.time) return false;
+    if (filters.people && a.people !== filters.people) return false;
+    if (filters.diff && a.diff !== filters.diff) return false;
+    if (filters.prep && a.prep !== filters.prep) return false;
+    return true;
+  });
+}
+
+function renderEntries() {
+  const filtered = getFiltered();
+  document.getElementById('count').textContent = filtered.length + ' 件';
+  const main = document.getElementById('entries');
+  if (filtered.length === 0) {
+    main.innerHTML = '<p class="empty">条件に合う企画がありません。絞り込みを変えてみてください。</p>';
+    return;
+  }
+  main.innerHTML = filtered.map((a, i) => {
+    const isOpen = openId === a.id;
+    const ribbonColor = DIFF_COLORS[a.diff];
+    return `
+    <article class="entry" style="animation-delay:${i*0.04}s">
+      <div class="entry-row" onclick="toggleEntry(${a.id})">
+        <div class="ribbon" style="background:${ribbonColor}"><span>${a.diff}</span></div>
+        <div class="ribbon-cut" style="border-top-color:${ribbonColor}"></div>
+        <div class="entry-title-row">
+          <h2 class="entry-title${isOpen?' open':''}">${a.title}</h2>
+          <div class="entry-meta">
+            <span>${a.major}</span><span class="sep">/</span><span>${a.minor}</span>
+            <span class="sep">|</span><span>${a.time}</span><span>${a.people}</span>
+            ${a.prep==='必要'?'<span class="prep-tag">準備要</span>':''}
+          </div>
+        </div>
+        <p class="entry-catch">${a.catch}</p>
+      </div>
+      <div class="detail-panel${isOpen?' open':''}">
+        ${detailBlock('目的', a.purpose)}
+        ${detailBlock('企画設計', a.design)}
+        ${flowBlock(a.flow)}
+        ${scheduleBlock(a.schedule)}
+        ${detailBlock('コツ・アレンジ', a.tips)}
+        ${detailBlock('準備するもの', a.materials)}
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function detailBlock(label, content) {
+  let body;
+  if (Array.isArray(content)) {
+    body = '<ul>' + content.map(c => `<li>${c}</li>`).join('') + '</ul>';
+  } else {
+    body = `<p>${content}</p>`;
+  }
+  return `<div class="detail-text"><p class="detail-label">${label}</p>${body}</div>`;
+}
+
+function flowBlock(steps) {
+  const items = steps.map(s => `<li>${s}</li>`).join('');
+  return `<div class="detail-text"><p class="detail-label">流れ</p><ol>${items}</ol></div>`;
+}
+
+function scheduleBlock(sched) {
+  if (!sched) return '';
+  const rows = sched.steps.map((s, i) =>
+    `<div class="schedule-step"><span class="schedule-num">${i+1}.</span><span>${s.label}</span><span class="schedule-time">(${s.min})</span></div>`
+  ).join('');
+  return `<div class="detail-text"><p class="detail-label">タイムスケジュール例（${sched.total}）</p>${rows}</div>`;
+}
+
+function toggleEntry(id) {
+  openId = openId === id ? null : id;
+  renderEntries();
+}
+
+// ─── Init ───────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
