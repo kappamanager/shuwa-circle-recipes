@@ -4,749 +4,935 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>手話レコ — 手話サークルレクリエーションコレクション</title>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=RocknRoll+One&family=Kaisei+Decol:wght@500;700&family=M+PLUS+1+Code:wght@500;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #F2EEE5;
-    --paper: #EFEAE0;
-    --paper-tint: #E9E2D3;
-    --ink: #1F1D1A;
-    --ink-2: #3C3934;
-    --ink-3: #6F6A60;
-    --ink-4: #9A9488;
-    --rule: #C9C2B2;
-    --rule-soft: #D8D1C0;
-    --terra: #B8533E;
-    --terra-deep: #8E3F2E;
-    --terra-ink: #5A271C;
-    --olive: #7A7B4A;
-    --accent-green: #6E8A6A;
-    --accent-amber: #B07C2E;
+    /* 画用紙パレット — 彩度は紙色らしく控えめ */
+    --cream:   #F6EED6;      /* 地: 淡クリーム */
+    --cream-2: #EFE4C4;      /* 地2: もう少し黄ばみ */
+    --paper:   #FFF8E7;      /* カード紙 */
+    --ink:     #1F1A17;      /* 墨 */
+    --ink-2:   #3A332D;
+    --ink-3:   #6B6258;
+    --ink-4:   #948A7D;
+
+    --red:     #D94A3D;      /* 朱赤 */
+    --red-ink: #8A2E26;
+    --yellow:  #E8B52A;      /* マスタード */
+    --yellow-ink:#8A6A14;
+    --green:   #5E9B5A;      /* ミントよりサルビア緑 */
+    --green-ink:#2F5B2C;
+    --blue:    #2D6BA8;      /* 画用紙ブルー */
+    --blue-ink:#143A63;
+    --pink:    #E48AA6;      /* 差し色ピンク */
   }
 
-  html { background: var(--bg); }
+  html, body { background: var(--cream); }
   body {
     min-height: 100vh;
-    background:
-      radial-gradient(1200px 600px at 8% -10%, rgba(184,83,62,0.045), transparent 60%),
-      radial-gradient(900px 500px at 92% 0%, rgba(122,122,74,0.04), transparent 60%),
-      var(--bg);
     color: var(--ink);
-    font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 400;
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-weight: 500;
     -webkit-font-smoothing: antialiased;
-    letter-spacing: 0.01em;
-    /* paper grain */
+    letter-spacing: 0.02em;
+    overflow-x: hidden;
+    background:
+      /* 方眼 */
+      linear-gradient(to right, rgba(31,26,23,0.05) 1px, transparent 1px) 0 0/32px 32px,
+      linear-gradient(to bottom, rgba(31,26,23,0.05) 1px, transparent 1px) 0 0/32px 32px,
+      /* 紙の色ムラ */
+      radial-gradient(800px 400px at 5% 10%, rgba(232,181,42,0.10), transparent 60%),
+      radial-gradient(900px 500px at 95% 85%, rgba(217,74,61,0.06), transparent 60%),
+      var(--cream);
     background-attachment: fixed;
   }
+  /* ノイズ（紙の質感） */
   body::before {
     content: "";
     position: fixed; inset: 0;
     pointer-events: none; z-index: 0;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    opacity: 0.55;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 0.07 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.6;
     mix-blend-mode: multiply;
   }
 
-  ::selection { background: var(--terra); color: #fff; }
-  a { color: inherit; }
+  ::selection { background: var(--yellow); color: var(--ink); }
 
-  /* ─── Masthead ────────────────────────────────────────── */
-  .masthead {
-    position: relative;
-    border-bottom: 1px solid var(--ink);
-    background: transparent;
+  /* ─── ページ外周 ───────────────────────────────────── */
+  .page {
+    position: relative; z-index: 1;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 28px 24px 80px;
   }
-  .masthead::before {
-    /* top hairline companion */
+
+  /* ─── ヘッダー(おもちゃ箱のフタ) ─────────────────── */
+  .boxlid {
+    position: relative;
+    background: var(--red);
+    color: var(--cream);
+    padding: 34px 36px 44px;
+    box-shadow:
+      0 0 0 4px var(--cream) inset,
+      0 0 0 5px var(--ink) inset,
+      6px 6px 0 0 var(--ink);
+    border: 2px solid var(--ink);
+    overflow: hidden;
+  }
+  /* フタの色紙ストライプ */
+  .boxlid::before {
     content: "";
-    position: absolute; left: 0; right: 0; bottom: -4px;
-    border-bottom: 1px solid var(--ink);
-  }
-  .masthead-top {
-    max-width: 1040px; margin: 0 auto; padding: 14px 40px;
-    display: flex; justify-content: space-between; align-items: center;
-    font-family: 'EB Garamond', 'Shippori Mincho', serif;
-    font-size: 11px; letter-spacing: 0.22em;
-    color: var(--ink-2); text-transform: uppercase;
-    border-bottom: 1px solid var(--rule);
-  }
-  .masthead-top .left, .masthead-top .right { display: flex; gap: 18px; }
-  .masthead-top .divider { color: var(--ink-4); }
-
-  .masthead-main {
-    max-width: 1040px; margin: 0 auto;
-    padding: 38px 40px 34px;
-    position: relative;
-  }
-  .masthead-row { display: flex; justify-content: center; align-items: center; }
-  .masthead-meta-l, .masthead-meta-r {
-    font-family: 'EB Garamond', serif;
-    font-size: 11px; letter-spacing: 0.18em;
-    color: var(--ink-3); text-transform: uppercase;
-    line-height: 1.9;
-  }
-  .masthead-meta-r { text-align: right; font-style: italic; }
-  .masthead-title {
-    font-family: 'Shippori Mincho', serif;
-    font-weight: 800;
-    font-size: clamp(72px, 11vw, 148px);
-    line-height: 0.88;
-    letter-spacing: -0.03em;
-    color: var(--ink);
-    text-align: center;
-    white-space: nowrap;
-    position: relative;
-  }
-  .masthead-title .dot {
-    color: var(--terra);
-    font-size: 0.35em;
-    vertical-align: 0.75em;
-    margin-left: 0.08em;
-    letter-spacing: 0;
-  }
-  .masthead-sub {
-    max-width: 1040px; margin: 0 auto;
-    padding: 18px 40px 26px;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 32px;
-    align-items: start;
-    border-top: 1px solid var(--rule);
-  }
-  .masthead-sub .kicker {
-    font-family: 'Shippori Mincho', serif;
-    font-weight: 500;
-    font-size: 14px;
-    letter-spacing: 0.18em;
-    color: var(--ink-2);
-    line-height: 2;
-    white-space: nowrap;
-  }
-  .masthead-sub .lede {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 14.5px;
-    line-height: 2;
-    color: var(--ink-2);
-    max-width: 540px;
-    justify-self: center;
-  }
-  .masthead-sub .lede .drop {
-    font-size: 17px; font-weight: 600; color: var(--terra);
-    letter-spacing: 0.12em;
-  }
-  .masthead-sub .lede a.cta {
-    display: inline-flex; align-items: baseline; gap: 6px;
-    color: var(--terra); text-decoration: none;
-    border-bottom: 1px solid var(--terra);
-    padding-bottom: 1px;
-    font-weight: 600;
-    transition: color .15s, border-color .15s;
-  }
-  .masthead-sub .lede a.cta::after {
-    content: "↗"; font-size: 0.9em; letter-spacing: 0;
-  }
-  .masthead-sub .lede a.cta:hover { color: var(--terra-deep); border-color: var(--terra-deep); }
-  .masthead-sub .volume {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 12px; letter-spacing: 0.15em;
-    color: var(--ink-3);
-    text-align: right;
-    line-height: 1.9;
-  }
-  .masthead-sub .volume .num {
-    display: block;
-    font-family: 'Shippori Mincho', serif;
-    font-size: 44px;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-    line-height: 1;
-    font-weight: 400;
-    margin-bottom: 6px;
-  }
-
-  /* ─── Container ───────────────────────────────────────── */
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 1; }
-
-  /* ─── Filter bar (index) ─────────────────────────────── */
-  .index-bar {
-    position: relative;
-    margin-top: 40px;
-    padding: 28px 0 26px;
-    border-top: 2px solid var(--ink);
-    border-bottom: 1px solid var(--ink);
+    position: absolute; inset: 0;
     background:
-      linear-gradient(to bottom, rgba(232,224,205,0.55), rgba(232,224,205,0.35)),
-      transparent;
+      repeating-linear-gradient(
+        -35deg,
+        rgba(255,255,255,0.00) 0 22px,
+        rgba(255,248,231,0.06) 22px 28px,
+        rgba(255,255,255,0.00) 28px 54px
+      );
+    pointer-events: none;
   }
-  /* double rule at bottom */
-  .index-bar::after {
-    content: "";
-    position: absolute; left: 0; right: 0; bottom: -4px;
-    border-bottom: 1px solid var(--ink);
-  }
-  .index-bar-inner {
-    max-width: 1040px; margin: 0 auto; padding: 0 40px;
-    display: grid;
-    grid-template-columns: 112px 1fr;
-    gap: 28px;
-  }
-  .index-bar-label {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 12px; letter-spacing: 0.15em;
-    color: var(--ink-3);
-    border-right: 1px solid var(--rule);
-    padding-right: 16px;
-  }
-  .index-bar-label .ja {
-    display: block;
-    font-family: 'Shippori Mincho', serif;
-    font-size: 17px;
-    letter-spacing: 0.18em;
-    color: var(--ink);
-    margin-top: 6px;
-  }
-  .index-bar-label .count-line {
-    display: block;
-    margin-top: 18px;
-    font-family: 'EB Garamond', serif;
+  .boxlid-top {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'M PLUS 1 Code', monospace;
     font-size: 11px; letter-spacing: 0.2em;
-    color: var(--ink-3);
-  }
-  .index-bar-label .count-line b {
-    font-family: 'Shippori Mincho', serif;
-    font-weight: 600;
-    font-size: 24px;
-    color: var(--ink);
-    letter-spacing: 0;
-  }
-
-  .filters-grid { display: flex; flex-direction: column; gap: 10px; }
-  .filter-row {
-    display: grid;
-    grid-template-columns: 96px 1fr;
-    align-items: baseline;
-    gap: 14px;
-  }
-  .filter-label {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 12px; font-weight: 500;
-    letter-spacing: 0.1em;
-    color: var(--ink-3);
-    display: flex; align-items: center; gap: 8px;
-    white-space: nowrap;
-  }
-  .filter-label::after { content: ""; display: inline-block; flex: 1; border-top: 1px solid var(--rule); }
-  .filter-group { display: flex; gap: 4px; flex-wrap: wrap; }
-  .tag-btn {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 12px;
-    font-weight: 400;
-    padding: 4px 12px;
-    color: var(--ink-3);
-    letter-spacing: 0.04em;
+    margin-bottom: 22px;
+    text-transform: uppercase;
     position: relative;
-    transition: color .15s;
-    border-left: 1px solid transparent;
   }
-  .tag-btn + .tag-btn { border-left: 1px solid var(--rule); }
-  .tag-btn:hover { color: var(--ink); }
-  .tag-btn.active {
-    color: var(--ink);
+  .boxlid-top .corner {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 4px 10px;
+    background: var(--cream); color: var(--ink);
+    border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 0 var(--ink);
     font-weight: 700;
   }
-  .tag-btn.active::after {
-    content: "";
-    position: absolute;
-    left: 12px; right: 12px; bottom: 0px;
-    border-bottom: 1.5px solid var(--terra);
+  .boxlid-top .corner .dot {
+    width: 8px; height: 8px; background: var(--red); border: 1.5px solid var(--ink);
+    display: inline-block;
   }
-  .reset-btn {
-    border: none; background: none; cursor: pointer;
-    font-family: 'Shippori Mincho', serif;
-    font-size: 12px;
-    color: var(--terra);
-    padding: 0; margin-top: 4px;
-    letter-spacing: 0.15em;
-    display: none;
-    align-self: flex-start;
+  .boxlid-top .tag-corner {
+    background: var(--yellow); color: var(--ink);
   }
-  .reset-btn::before { content: "× "; font-family: sans-serif; }
-  .reset-btn.visible { display: inline-block; }
-  .reset-btn:hover { color: var(--terra-deep); }
 
-  /* ─── Directory ──────────────────────────────────────── */
-  .directory-head {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 40px 0 14px;
-  }
-  .directory-head .section-no {
-    font-family: 'EB Garamond', serif;
-    font-size: 11px; letter-spacing: 0.3em;
-    color: var(--ink-3); text-transform: uppercase;
-  }
-  .directory-head .section-title {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 14px; font-weight: 500;
-    letter-spacing: 0.5em;
-    color: var(--ink);
-  }
-  .directory-head .section-title::before { content: "— "; color: var(--ink-4); margin-right: 4px; }
-  .directory-head .section-title::after { content: " —"; color: var(--ink-4); margin-left: -2px; }
-
-  .empty {
-    color: var(--ink-3);
-    font-family: 'Shippori Mincho', serif;
-    font-size: 15px;
-    padding: 64px 0;
-    border-top: 1px solid var(--ink);
-    text-align: center;
-    letter-spacing: 0.2em;
-  }
-  .empty::before { content: "— "; }
-  .empty::after { content: " —"; }
-
-  /* ─── Entry row ──────────────────────────────────────── */
-  #entries { border-top: 1px solid var(--ink); }
-  .entry { animation: fadeUp 0.4s ease both; }
-  .entry-row {
-    border-bottom: 1px solid var(--rule);
-    padding: 26px 56px 26px 0;
-    cursor: pointer;
-    position: relative;
-    transition: background .15s;
+  .boxlid-main {
     display: grid;
-    grid-template-columns: 72px 1fr;
-    gap: 24px;
-    align-items: baseline;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 28px;
+    position: relative;
   }
-  .entry-row:hover { background: rgba(31,29,26,0.025); }
-  .entry-row:hover .entry-title { color: var(--terra-ink); }
-  .entry-row.is-open { background: transparent; }
-  .entry-row.is-open .entry-title { color: var(--terra); }
-
-  .entry-num {
-    font-family: 'EB Garamond', serif;
+  .boxlid-title {
+    font-family: 'Kaisei Decol', serif;
+    font-weight: 700;
+    font-size: clamp(56px, 9vw, 128px);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    color: var(--cream);
+    white-space: nowrap;
+    text-shadow:
+      4px 4px 0 var(--ink),
+      4px 4px 0 2px var(--ink);
+    position: relative;
+    display: inline-block;
+  }
+  .boxlid-title .reco {
+    color: var(--yellow);
+  }
+  /* タイトル右の星 */
+  .star {
+    display: inline-block;
+    width: 1em; height: 1em;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    vertical-align: 0.05em;
+    margin-left: 0.1em;
+    transform: rotate(-8deg);
+  }
+  .boxlid-sub-wrap { text-align: right; }
+  .subtitle-ribbon {
+    display: inline-block;
+    background: var(--cream); color: var(--ink);
+    border: 2px solid var(--ink);
+    padding: 6px 14px 6px 22px;
+    font-family: 'RocknRoll One', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    box-shadow: 3px 3px 0 0 var(--ink);
+    clip-path: polygon(12px 0, 100% 0, 100% 100%, 12px 100%, 0 50%);
+    margin-bottom: 10px;
+  }
+  .volume-stamp {
+    display: inline-block;
+    color: var(--cream);
+    border: 2px dashed var(--cream);
+    padding: 6px 14px;
+    font-family: 'M PLUS 1 Code', monospace;
     font-size: 11px;
     letter-spacing: 0.25em;
-    color: var(--ink-4);
-    text-align: left;
-    line-height: 1.6;
-    padding-top: 2px;
-    font-feature-settings: "tnum";
+    transform: rotate(-3deg);
   }
-  .entry-num .big {
-    display: block;
-    font-family: 'Shippori Mincho', serif;
-    font-size: 32px;
+  .volume-stamp b {
+    font-family: 'Kaisei Decol', serif;
+    font-size: 22px;
+    letter-spacing: 0;
+    color: var(--yellow);
+    margin: 0 4px;
+  }
+
+  .boxlid-lede {
+    margin-top: 26px;
+    background: var(--cream);
     color: var(--ink);
-    letter-spacing: -0.01em;
-    line-height: 1;
-    margin-top: 6px;
-    font-weight: 500;
+    border: 2px solid var(--ink);
+    box-shadow: 4px 4px 0 0 var(--ink);
+    padding: 20px 24px;
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-size: 15px;
+    line-height: 1.95;
+    position: relative;
+    transform: rotate(-0.4deg);
   }
-
-  .entry-body { min-width: 0; }
-  .entry-title-row {
-    display: flex; justify-content: space-between;
-    align-items: baseline; gap: 18px; flex-wrap: wrap;
+  .boxlid-lede::before {
+    content: "❝";
+    position: absolute;
+    top: -14px; left: 18px;
+    font-family: 'Kaisei Decol', serif;
+    font-size: 42px;
+    color: var(--red);
+    background: var(--cream);
+    border: 2px solid var(--ink);
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    padding-top: 4px;
+    box-shadow: 2px 2px 0 0 var(--ink);
   }
-  .entry-title {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 24px; font-weight: 600;
-    letter-spacing: 0.02em;
-    line-height: 1.3;
-    transition: color .15s;
-  }
-  .entry-meta {
-    display: flex; gap: 10px;
-    font-family: 'EB Garamond', serif;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    color: var(--ink-3);
-    text-transform: uppercase;
-    flex-wrap: wrap;
-    align-items: baseline;
-  }
-  .entry-meta .ja { font-family: 'Noto Sans JP', sans-serif; letter-spacing: 0.1em; }
-  .entry-meta .sep { color: var(--ink-4); }
-  .entry-meta .prep-tag {
-    color: var(--terra);
-    border: 1px solid var(--terra);
-    padding: 1px 6px;
-    letter-spacing: 0.12em;
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 10px;
-    font-weight: 500;
-  }
-  .entry-catch {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 14px;
-    line-height: 1.9;
-    color: var(--ink-2);
-    margin-top: 10px;
-    max-width: 720px;
-  }
-  .entry-chev {
-    position: absolute; right: 0; top: 30px;
-    font-family: 'EB Garamond', serif;
-    color: var(--ink-3);
-    font-size: 14px;
-    letter-spacing: 0.2em;
-    transition: color .15s, transform .2s;
-  }
-  .entry-row:hover .entry-chev { color: var(--terra); }
-  .entry-row.is-open .entry-chev { color: var(--terra); transform: rotate(90deg) translateX(2px); }
-
-  /* Ribbon (difficulty bookmark) */
-  .ribbon {
-    position: absolute; right: 14px; top: -1px;
-    width: 22px; height: 58px;
-    display: flex; align-items: flex-start; justify-content: center;
-    padding-top: 6px;
-    box-shadow: -1px 0 0 rgba(0,0,0,0.08) inset;
-  }
-  .ribbon span {
-    writing-mode: vertical-rl;
-    font-family: 'Shippori Mincho', serif;
-    font-size: 10px;
+  .boxlid-lede .cta {
+    color: var(--red-ink);
     font-weight: 700;
-    color: #fff;
-    letter-spacing: 0.15em;
+    text-decoration: none;
+    background: var(--yellow);
+    border: 1.5px solid var(--ink);
+    padding: 1px 10px 2px;
+    margin: 0 2px;
+    display: inline-block;
+    transform: rotate(-2deg);
+    box-shadow: 2px 2px 0 0 var(--ink);
     white-space: nowrap;
   }
-  .ribbon-cut {
-    position: absolute; right: 14px; top: 57px;
-    width: 0; height: 0;
-    border-left: 11px solid transparent;
-    border-right: 11px solid transparent;
-  }
+  .boxlid-lede .cta:hover { background: var(--cream); }
 
-  /* ─── Detail panel ───────────────────────────────────── */
-  .detail-panel {
-    display: none;
-    border-bottom: 1px solid var(--rule);
+  /* ─── ピン留めの「画びょう」装飾 ──────────────── */
+  .pin {
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff 0 2px, var(--red) 3px 60%, var(--red-ink) 100%);
+    border: 1.5px solid var(--ink);
+    box-shadow: 1px 2px 0 0 rgba(0,0,0,0.25);
+    z-index: 5;
+  }
+  .pin.yellow { background: radial-gradient(circle at 35% 35%, #fff 0 2px, var(--yellow) 3px 60%, var(--yellow-ink) 100%); }
+  .pin.blue   { background: radial-gradient(circle at 35% 35%, #fff 0 2px, var(--blue) 3px 60%, var(--blue-ink) 100%); }
+  .pin.green  { background: radial-gradient(circle at 35% 35%, #fff 0 2px, var(--green) 3px 60%, var(--green-ink) 100%); }
+
+  /* ─── フィルタ = 引き出し ────────────────────── */
+  .drawer {
+    margin-top: 44px;
+    position: relative;
     background: var(--paper);
-    animation: fadeUp .3s ease;
+    border: 2px solid var(--ink);
+    box-shadow: 6px 6px 0 0 var(--ink);
+    padding: 26px 30px 22px;
+  }
+  /* ミシン目 */
+  .drawer::before {
+    content: "";
+    position: absolute; left: 14px; right: 14px; top: 14px;
+    border-top: 2px dashed var(--ink);
+    opacity: 0.35;
+  }
+  .drawer-head {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 18px; flex-wrap: wrap;
+  }
+  .drawer-head .label {
+    font-family: 'Kaisei Decol', serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.1em;
+    background: var(--ink); color: var(--cream);
+    padding: 4px 14px 6px;
+    transform: rotate(-1.5deg);
+    box-shadow: 3px 3px 0 0 var(--yellow);
+  }
+  .drawer-head .count {
+    margin-left: auto;
+    font-family: 'M PLUS 1 Code', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--ink-3);
+    display: flex; align-items: baseline; gap: 6px;
+    border: 1.5px solid var(--ink);
+    background: var(--cream);
+    padding: 5px 12px 6px;
+    box-shadow: 2px 2px 0 0 var(--ink);
+  }
+  .drawer-head .count b {
+    font-family: 'Kaisei Decol', serif;
+    color: var(--red);
+    font-size: 22px;
+    letter-spacing: 0;
+  }
+  .drawer-head .count .slash { color: var(--ink-4); }
+
+  .filters-grid { display: grid; grid-template-columns: 100px 1fr; gap: 10px 16px; align-items: start; }
+  .filter-label {
+    font-family: 'RocknRoll One', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    letter-spacing: 0.15em;
+    background: var(--cream-2);
+    border: 1.5px solid var(--ink);
+    padding: 4px 10px;
+    text-align: center;
+    align-self: center;
     position: relative;
   }
-  .detail-panel.open { display: block; }
-  .detail-panel::before {
-    content: "";
-    position: absolute; left: 72px; top: 0; bottom: 0; width: 1px;
-    background: var(--rule-soft);
+  .filter-label::after {
+    content: ""; position: absolute;
+    right: -7px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 7px solid var(--ink);
   }
-  .detail-inner {
-    display: grid;
-    grid-template-columns: 72px 1fr;
-    gap: 24px;
-    padding: 28px 56px 36px 0;
+  .filter-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; min-height: 34px; }
+  .chip {
+    border: 1.5px solid var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-weight: 700;
+    font-size: 12.5px;
+    padding: 4px 12px 5px;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+    box-shadow: 2px 2px 0 0 var(--ink);
+    transition: transform .08s, box-shadow .08s, background .12s, color .12s;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
-  .detail-rail {
-    font-family: 'EB Garamond', serif;
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    color: var(--ink-4);
-    text-transform: uppercase;
-    writing-mode: vertical-rl;
-    align-self: start;
-    padding-top: 4px;
+  .chip:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 0 var(--ink); }
+  .chip:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 0 var(--ink); }
+  .chip.active {
+    background: var(--ink); color: var(--yellow);
+    box-shadow: 2px 2px 0 0 var(--red);
   }
-  .detail-main { min-width: 0; padding-left: 24px; }
+  .chip.color-red   { background: var(--red); color: var(--cream); }
+  .chip.color-blue  { background: var(--blue); color: var(--cream); }
+  .chip.color-green { background: var(--green); color: var(--cream); }
+  .chip.color-yellow{ background: var(--yellow); color: var(--ink); }
+  .chip.active.color-red,
+  .chip.active.color-blue,
+  .chip.active.color-green,
+  .chip.active.color-yellow { color: var(--yellow); background: var(--ink); }
 
-  .detail-block { margin-bottom: 26px; }
+  .reset-btn {
+    border: 1.5px solid var(--ink); background: var(--cream);
+    cursor: pointer; font-family: 'RocknRoll One', sans-serif;
+    font-size: 12px; color: var(--red-ink);
+    padding: 3px 12px 4px;
+    letter-spacing: 0.1em;
+    box-shadow: 2px 2px 0 0 var(--red);
+    display: none;
+  }
+  .reset-btn::before { content: "× "; }
+  .reset-btn.visible { display: inline-block; }
+  .reset-btn:hover { background: var(--red); color: var(--cream); }
+
+  /* ─── ヘッドライン(区切り) ──────────────────────── */
+  .headline {
+    margin: 48px 0 20px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .headline .dots {
+    flex: 1;
+    border-top: 4px dotted var(--ink);
+    opacity: 0.55;
+  }
+  .headline h2 {
+    font-family: 'Kaisei Decol', serif;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: 0.2em;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    padding: 4px 20px 6px;
+    box-shadow: 4px 4px 0 0 var(--ink);
+    transform: rotate(-1deg);
+  }
+  .headline .count-sm {
+    font-family: 'M PLUS 1 Code', monospace;
+    font-size: 13px; letter-spacing: 0.15em; color: var(--ink-3);
+    border-left: 2px solid var(--ink);
+    padding-left: 14px;
+  }
+
+  /* ─── カード一覧 ────────────────────────────────── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 28px 24px;
+  }
+  @keyframes pop { from { opacity:0; transform: translateY(12px) rotate(var(--rot, 0deg)); } to { opacity:1; transform: translateY(0) rotate(var(--rot, 0deg)); } }
+  .card {
+    position: relative;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: 5px 5px 0 0 var(--ink);
+    transition: transform .18s cubic-bezier(.2,.9,.2,1.2), box-shadow .18s;
+    animation: pop .35s cubic-bezier(.2,.9,.2,1.2) both;
+    cursor: pointer;
+  }
+  .card:nth-child(3n)   { --rot: -0.6deg; }
+  .card:nth-child(3n+1) { --rot:  0.5deg; }
+  .card:nth-child(3n+2) { --rot: -0.2deg; }
+  .card { transform: rotate(var(--rot, 0deg)); }
+  .card:hover {
+    transform: rotate(0) translate(-2px, -3px);
+    box-shadow: 8px 9px 0 0 var(--ink);
+  }
+  .card.is-open {
+    transform: rotate(0);
+    box-shadow: 8px 9px 0 0 var(--ink);
+  }
+
+  /* カード上部の色バー(ジャンル表示) */
+  .card-band {
+    padding: 10px 16px 11px 70px;
+    color: var(--cream);
+    font-family: 'RocknRoll One', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 2px solid var(--ink);
+    position: relative;
+  }
+  .card-band.交流系 { background: var(--blue); }
+  .card-band.学習系 { background: var(--green); }
+  .card-band .minor {
+    background: var(--cream); color: var(--ink);
+    border: 1.5px solid var(--ink);
+    padding: 1px 8px 2px;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .card-body {
+    padding: 22px 20px 18px;
+    position: relative;
+  }
+  .card-num {
+    position: absolute;
+    top: -22px; left: -10px;
+    width: 54px; height: 54px;
+    background: var(--yellow);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    font-family: 'Kaisei Decol', serif;
+    font-weight: 700;
+    font-size: 28px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 3px 3px 0 0 var(--ink);
+    transform: rotate(-6deg);
+    line-height: 1;
+    padding-top: 4px;
+    z-index: 3;
+  }
+  .card-num::before {
+    content: "No.";
+    position: absolute;
+    top: -7px; left: 50%; transform: translateX(-50%);
+    font-family: 'M PLUS 1 Code', monospace;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    background: var(--ink); color: var(--yellow);
+    padding: 1px 6px;
+    border-radius: 2px;
+  }
+
+  /* 難易度チケット */
+  .ticket {
+    position: absolute;
+    top: -12px; right: 14px;
+    padding: 6px 14px 7px;
+    font-family: 'RocknRoll One', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    background: var(--red); color: var(--cream);
+    border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 0 var(--ink);
+    transform: rotate(4deg);
+    position: relative;
+  }
+  .ticket.やさしい { background: var(--green); }
+  .ticket.ふつう { background: var(--yellow); color: var(--ink); }
+  .ticket.しっかり { background: var(--red); }
+  .ticket::before, .ticket::after {
+    content: "";
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 6px; height: 6px; background: var(--cream);
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+  }
+  .ticket::before { left: -4px; }
+  .ticket::after  { right: -4px; }
+
+  .card-title-row {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 14px; margin-top: 26px; margin-bottom: 12px;
+  }
+  .card-title {
+    font-family: 'Kaisei Decol', serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+    color: var(--ink);
+    flex: 1;
+  }
+  .card-title-row .ticket { position: static; margin-top: 2px; transform: rotate(3deg); flex-shrink: 0; }
+
+  .card-catch {
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: var(--ink-2);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+
+  .card-meta {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding-top: 12px;
+    border-top: 2px dashed var(--ink);
+    position: relative;
+  }
+  .card-meta::before {
+    content: "✂"; 
+    position: absolute; top: -10px; left: 10px;
+    background: var(--paper); padding: 0 6px;
+    color: var(--ink-4);
+    font-size: 13px;
+  }
+  .meta-pill {
+    font-family: 'M PLUS 1 Code', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 2px 8px 3px;
+    border: 1.5px solid var(--ink);
+    background: var(--cream);
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .meta-pill.time { background: var(--cream-2); }
+  .meta-pill.prep-need { background: var(--red); color: var(--cream); }
+  .meta-pill.prep-none {}
+
+  /* ─── モーダル詳細 = おもちゃ箱から取り出したカード ──── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(31, 26, 23, 0.55);
+    backdrop-filter: blur(2px);
+    z-index: 100;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+    animation: fadeIn .2s ease both;
+  }
+  .modal-overlay.is-open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modalPop {
+    from { opacity: 0; transform: translateY(20px) rotate(-1deg) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
+  }
+  .modal-card {
+    position: relative;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: 8px 8px 0 0 var(--ink);
+    max-width: 720px;
+    width: 100%;
+    margin: auto;
+    animation: modalPop .25s cubic-bezier(.2,.9,.2,1.2) both;
+  }
+  .modal-card .card-band {
+    /* card-band スタイルを継承 */
+    padding-right: 64px;  /* 閉じるボタン分 */
+  }
+  .modal-close {
+    position: absolute;
+    top: -16px; right: -16px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--red);
+    color: var(--cream);
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 0 var(--ink);
+    font-family: 'Kaisei Decol', serif;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .modal-close:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 0 var(--ink);
+  }
+  .modal-body {
+    padding: 26px 28px 32px;
+  }
+  .modal-title-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    margin-bottom: 8px;
+  }
+  .modal-title {
+    font-family: 'Kaisei Decol', serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.3;
+    color: var(--ink);
+    flex: 1;
+  }
+  .modal-catch {
+    font-size: 14px;
+    color: var(--ink-3);
+    margin-bottom: 16px;
+    line-height: 1.7;
+  }
+  .modal-meta {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 1px dashed var(--ink-4);
+  }
+  .modal-detail {
+    background: var(--cream);
+    border: 1px solid var(--ink-4);
+    padding: 22px 22px 24px;
+    /* ノート罫線 */
+    background-image:
+      linear-gradient(var(--cream), var(--cream)),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0 27px,
+        rgba(31,26,23,0.08) 27px 28px
+      );
+    background-blend-mode: multiply;
+  }
+  body.modal-locked { overflow: hidden; }
+
+  @media (max-width: 540px) {
+    .modal-overlay { padding: 24px 12px; }
+    .modal-close { width: 38px; height: 38px; font-size: 18px; top: -12px; right: -12px; }
+    .modal-body { padding: 20px 18px 24px; }
+    .modal-title { font-size: 22px; }
+    .modal-detail { padding: 18px 16px 20px; }
+  }
+
+  .detail-block { margin-bottom: 20px; }
   .detail-block:last-child { margin-bottom: 0; }
   .detail-label {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 12px; font-weight: 600;
-    letter-spacing: 0.4em;
-    color: var(--terra);
+    display: inline-block;
+    font-family: 'RocknRoll One', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 3px 12px 4px;
     margin-bottom: 10px;
-    display: flex; align-items: center; gap: 12px;
+    box-shadow: 3px 3px 0 0 var(--red);
+    transform: rotate(-1deg);
   }
-  .detail-label::before {
-    content: ""; width: 18px; height: 1px; background: var(--terra);
-  }
+  .detail-block:nth-child(3n) .detail-label { box-shadow: 3px 3px 0 0 var(--blue); }
+  .detail-block:nth-child(3n+1) .detail-label { box-shadow: 3px 3px 0 0 var(--red); }
+  .detail-block:nth-child(3n+2) .detail-label { box-shadow: 3px 3px 0 0 var(--green); }
   .detail-text {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 14px;
-    line-height: 2;
+    font-size: 13.5px;
+    line-height: 1.95;
     color: var(--ink-2);
   }
   .detail-text p { margin: 0; }
-  .detail-text ul, .detail-text ol { margin: 0; padding-left: 20px; line-height: 2.1; }
+  .detail-text ul, .detail-text ol { margin: 0; padding-left: 1.2em; }
   .detail-text ul { list-style: none; padding-left: 0; }
-  .detail-text ul li { position: relative; padding-left: 22px; }
+  .detail-text ul li { position: relative; padding-left: 22px; margin: 4px 0; }
   .detail-text ul li::before {
-    content: "";
-    position: absolute; left: 0; top: 0.95em;
-    width: 10px; height: 1px; background: var(--ink-4);
+    content: "★";
+    position: absolute; left: 0; top: 0;
+    color: var(--red);
+    font-size: 13px;
   }
-  .detail-text ol { padding-left: 28px; }
-  .detail-text ol li { padding-left: 6px; }
-  .detail-text ol li::marker { color: var(--terra); font-weight: 600; }
+  .detail-text ol { counter-reset: flow; list-style: none; padding-left: 0; }
+  .detail-text ol li {
+    counter-increment: flow;
+    position: relative;
+    padding-left: 36px;
+    margin: 6px 0;
+  }
+  .detail-text ol li::before {
+    content: counter(flow);
+    position: absolute; left: 0; top: 2px;
+    width: 24px; height: 24px;
+    background: var(--yellow); border: 1.5px solid var(--ink);
+    font-family: 'Kaisei Decol', serif;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 2px 2px 0 0 var(--ink);
+    line-height: 1;
+  }
 
-  /* Schedule table */
-  .schedule-table {
-    border-top: 1px solid var(--rule);
+  /* スケジュール=時刻表 */
+  .schedule {
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    box-shadow: 3px 3px 0 0 var(--ink);
     margin-top: 4px;
   }
+  .schedule-head {
+    background: var(--blue);
+    color: var(--cream);
+    padding: 6px 12px 7px;
+    font-family: 'M PLUS 1 Code', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    display: flex; justify-content: space-between;
+    border-bottom: 2px solid var(--ink);
+  }
+  .schedule-head b { font-family: 'Kaisei Decol', serif; font-size: 14px; letter-spacing: 0; }
   .schedule-row {
     display: grid;
-    grid-template-columns: 40px 1fr 70px;
-    gap: 14px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--rule-soft);
-    font-family: 'Shippori Mincho', serif;
-    font-size: 13.5px;
-    align-items: baseline;
+    grid-template-columns: 34px 1fr 70px;
+    gap: 12px;
+    padding: 8px 12px;
+    border-bottom: 1.5px dashed rgba(31,26,23,0.25);
+    font-size: 13px;
+    align-items: center;
   }
+  .schedule-row:last-child { border-bottom: none; }
   .schedule-num {
-    font-family: 'EB Garamond', serif;
-    font-size: 12px;
-    color: var(--ink-4);
-    letter-spacing: 0.1em;
+    font-family: 'M PLUS 1 Code', monospace;
+    font-size: 11px;
+    background: var(--ink); color: var(--yellow);
+    text-align: center;
+    padding: 2px 0 3px;
   }
   .schedule-time {
-    font-family: 'EB Garamond', serif;
-    font-size: 12px;
+    font-family: 'M PLUS 1 Code', monospace;
+    font-size: 11.5px;
     color: var(--ink-3);
     text-align: right;
-    letter-spacing: 0.12em;
   }
-  .schedule-total {
-    font-family: 'Shippori Mincho', serif;
+
+  /* フラッグ: 開く・閉じる */
+  .card-flag {
+    position: absolute;
+    right: 16px; bottom: -14px;
+    padding: 5px 14px 6px;
+    background: var(--ink); color: var(--yellow);
+    font-family: 'RocknRoll One', sans-serif;
     font-size: 12px;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
+    border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 0 var(--red);
+    clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+  }
+  .card.is-open .card-flag { background: var(--red); color: var(--cream); }
+
+  /* ─── 空 ─── */
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 56px 20px;
+    background: var(--paper);
+    border: 2px dashed var(--ink);
+    font-family: 'Kaisei Decol', serif;
+    font-weight: 700;
+    font-size: 17px;
     color: var(--ink-3);
-    margin-left: 12px;
+    letter-spacing: 0.1em;
   }
-  .schedule-total b {
-    font-family: 'Shippori Mincho', serif;
-    color: var(--ink);
-    font-weight: 600;
-    letter-spacing: 0;
-    font-size: 14px;
-  }
+  .empty::before { content: "☹  "; color: var(--red); }
 
-  /* ─── Footer ─────────────────────────────────────────── */
+  /* ─── フッター ─────────────────────────────────── */
   footer {
-    border-top: 2px solid var(--ink);
     margin-top: 72px;
-    padding: 32px 0 60px;
-    position: relative;
+    background: var(--ink);
+    color: var(--cream);
+    border: 2px solid var(--ink);
+    box-shadow: 6px 6px 0 0 var(--red);
+    padding: 28px 28px 30px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;
   }
-  footer::before {
-    content: "";
-    position: absolute; left: 0; right: 0; top: -4px;
-    border-top: 1px solid var(--ink);
+  footer .logo {
+    font-family: 'Kaisei Decol', serif;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: 0.08em;
   }
-  .footer-inner {
-    max-width: 1040px; margin: 0 auto; padding: 0 40px;
-    display: flex; justify-content: center; align-items: baseline;
-    font-family: 'Shippori Mincho', serif;
-    font-size: 11px; letter-spacing: 0.28em;
-    color: var(--ink-3); text-transform: uppercase;
+  footer .logo .dot { color: var(--red); }
+  footer .mini {
+    font-family: 'M PLUS 1 Code', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--cream-2);
   }
-  .footer-inner .mark {
-    font-family: 'Shippori Mincho', serif;
-    font-size: 14px; font-weight: 600;
-    color: var(--ink);
-    letter-spacing: 0.4em;
-  }
-  .footer-inner .mark .dot { color: var(--terra); }
 
-  /* Animations */
-  @keyframes fadeUp { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
-
-  /* Responsive */
+  /* ─── モバイル ─────────────────────────────────── */
   @media (max-width: 720px) {
-    .masthead-top { padding: 10px 20px; font-size: 9.5px; gap: 10px; flex-wrap: wrap; }
-    .masthead-top .left, .masthead-top .right { gap: 10px; }
-    .masthead-main { padding: 28px 20px 24px; }
-    .masthead-row { grid-template-columns: 1fr; gap: 14px; }
-    .masthead-meta-l, .masthead-meta-r { display: none; }
-    .masthead-title { font-size: clamp(54px, 22vw, 96px); }
-    .masthead-sub { grid-template-columns: 1fr; gap: 18px; padding: 16px 20px 22px; }
-    .masthead-sub .kicker { text-align: center; white-space: normal; }
-    .masthead-sub .volume { display: none; }
-    .masthead-sub .lede { font-size: 13.5px; line-height: 1.95; }
+    .page { padding: 18px 14px 60px; }
+    .boxlid { padding: 22px 18px 30px; box-shadow: 0 0 0 3px var(--cream) inset, 0 0 0 4px var(--ink) inset, 4px 4px 0 0 var(--ink); }
+    .boxlid-top { font-size: 9.5px; gap: 8px; flex-wrap: wrap; }
+    .boxlid-main { grid-template-columns: 1fr; gap: 14px; }
+    .boxlid-sub-wrap { text-align: left; }
+    .boxlid-title { font-size: clamp(44px, 14vw, 80px); text-shadow: 3px 3px 0 var(--ink); white-space: nowrap; }
+    .boxlid-lede { font-size: 14px; padding: 16px 16px 18px; }
 
-    .wrap { padding: 0 20px; }
-    .index-bar-inner { grid-template-columns: 1fr; padding: 0 20px; gap: 14px; }
-    .index-bar-label { border-right: none; border-bottom: 1px solid var(--rule); padding: 0 0 12px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-    .index-bar-label .ja { margin-top: 0; font-size: 15px; letter-spacing: 0.15em; }
-    .index-bar-label .count-line { margin-top: 0; }
-    .filter-row { grid-template-columns: 54px 1fr; gap: 10px; }
-    .filter-label { font-size: 11px; letter-spacing: 0.2em; }
+    .drawer { padding: 20px 16px 18px; box-shadow: 4px 4px 0 0 var(--ink); }
+    .drawer-head .label { font-size: 18px; padding: 3px 12px; }
+    .filters-grid { grid-template-columns: 1fr; gap: 6px 0; }
+    .filter-label { text-align: left; width: fit-content; padding: 3px 10px; }
     .filter-label::after { display: none; }
 
-    .entry-row { grid-template-columns: 46px 1fr; gap: 14px; padding-right: 42px; padding-top: 22px; padding-bottom: 22px; }
-    .entry-num .big { font-size: 24px; }
-    .entry-title { font-size: 19px; }
-    .entry-meta { font-size: 10px; gap: 8px; }
-    .ribbon { right: 10px; width: 18px; height: 62px; padding-top: 6px; }
-    .ribbon span { font-size: 9.5px; letter-spacing: 0.05em; }
-    .ribbon-cut { right: 10px; top: 61px; border-left-width: 9px; border-right-width: 9px; border-top-width: 6px; }
-    .detail-inner { grid-template-columns: 1fr; padding: 20px 16px 28px; gap: 14px; }
-    .detail-panel::before { display: none; }
-    .detail-rail { writing-mode: horizontal-tb; }
-    .detail-main { padding-left: 0; }
-    .schedule-row { grid-template-columns: 34px 1fr 60px; font-size: 12.5px; }
-    .footer-inner { flex-direction: column; gap: 12px; }
+    .headline h2 { font-size: 22px; padding: 3px 16px; }
+    .headline { gap: 10px; }
+
+    .cards { grid-template-columns: 1fr; gap: 40px 0; }
+    .card { transform: rotate(0) !important; }
+    .card-num { width: 46px; height: 46px; font-size: 24px; top: -14px; }
+    .card-title { font-size: 19px; }
+
+    footer { padding: 20px; }
+    footer .logo { font-size: 22px; }
   }
 
   @media print {
     body::before { display: none; }
-    .index-bar, .reset-btn, .entry-chev, .ribbon, .ribbon-cut { display: none !important; }
-    .entry-row { break-inside: avoid; page-break-inside: avoid; }
-    .detail-panel { display: block !important; }
+    .drawer, .reset-btn, .card-flag { display: none !important; }
+    .card { break-inside: avoid; }
+    .card-open-note { display: block !important; }
   }
 </style>
 </head>
 <body>
-  <!-- ─── Masthead ─────────────────────────────────────── -->
-  <div class="masthead">
-    <div class="masthead-main">
-      <div class="masthead-row">
-        <h1 class="masthead-title">手話レコ</h1>
-      </div>
-    </div>
+<div class="page">
 
-    <div class="masthead-sub">
-      <div class="kicker">手話サークル<br>レクリエーション<br>コレクション</div>
-      <div class="lede">
-        どんな企画をしたらいいか分からない。それに応えて、各地のサークル運営から企画案を集めました。目的・流れ・タイムスケジュールまで、そのまま持ち込める形で収録しています。提案は<a class="cta" href="#">こちら</a>から。
-      </div>
-      <div class="volume">
-        <span class="num" id="vol-count">20</span>
-        件を収録
-      </div>
-    </div>
-  </div>
+  <!-- ─── 箱のフタ(ヘッダー) ─── -->
+  <header class="boxlid">
+    <span class="pin yellow" style="top: 14px; left: 14px;"></span>
+    <span class="pin blue" style="top: 14px; right: 14px;"></span>
+    <span class="pin green" style="bottom: 14px; left: 14px;"></span>
+    <span class="pin" style="bottom: 14px; right: 14px;"></span>
 
-  <!-- ─── Filter bar / Index ───────────────────────────── -->
-  <section class="index-bar" aria-label="絞り込み">
-    <div class="index-bar-inner">
-      <div class="index-bar-label">
-        <div>
-          <span class="ja">絞り込み</span>
-        </div>
-        <div class="count-line">
-          <b id="count-big">20</b> / <span id="count-total">20</span> 件
-        </div>
-      </div>
-      <div class="filters-grid" id="filters"></div>
+    <div class="boxlid-top">
+      <span class="corner"><span class="dot"></span>手話サークル企画集</span>
     </div>
+    <div class="boxlid-main">
+      <h1 class="boxlid-title">手話<span class="reco">レコ</span><span class="star" aria-hidden="true"></span></h1>
+      <div class="boxlid-sub-wrap">
+        <div class="subtitle-ribbon">レクリエーションコレクション</div>
+        <div class="volume-stamp">全 <b id="vol-count">20</b> 件収録</div>
+      </div>
+    </div>
+    <div class="boxlid-lede">
+      どんな企画をしたらいいか分からない。そんなときの、おもちゃ箱。
+      各地のサークル運営から集めた企画案を、目的・流れ・タイムスケジュールまで、そのまま持ち込める形で詰め込みました。
+      提案は<a class="cta" href="#">こちら</a>から。
+    </div>
+  </header>
+
+  <!-- ─── 絞り込み(引き出し) ─── -->
+  <section class="drawer" aria-label="絞り込み">
+    <div class="drawer-head">
+      <span class="label">▼ 引き出しを あける</span>
+      <span class="count"><span class="slash">表示中</span><b id="count-big">20</b>/<span id="count-total">20</span>件</span>
+    </div>
+    <div class="filters-grid" id="filters"></div>
   </section>
 
-  <!-- ─── Directory ────────────────────────────────────── -->
-  <div class="wrap">
-    <div class="directory-head">
-      <span class="section-title">企画一覧</span>
-      <span class="section-no" id="sort-label">全20件</span>
-    </div>
-    <main id="entries"></main>
+  <!-- ─── 区切り ─── -->
+  <div class="headline">
+    <span class="dots"></span>
+    <h2>あそび一覧</h2>
+    <span class="count-sm" id="sort-label">全20件</span>
+    <span class="dots"></span>
   </div>
 
-  <!-- ─── Footer ───────────────────────────────────────── -->
+  <!-- ─── カード一覧 ─── -->
+  <main id="entries" class="cards"></main>
+
+  <!-- ─── 詳細モーダル ─── -->
+  <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+    <div class="modal-card" id="modal-card" onclick="event.stopPropagation()"></div>
+  </div>
+
   <footer>
-    <div class="footer-inner">
-      <span class="mark">手話レコ</span>
-    </div>
+    <span class="logo">手話<span class="dot">・</span>レコ</span>
   </footer>
+</div>
 
+<script src="data.js"></script>
 <script>
-// ─── Data ───────────────────────────────────────────────
-const ACTIVITIES = [
-  {id:1,title:"積み木自己紹介",catch:"記憶力×自己紹介。アイスブレイクの定番。",major:"交流系",minor:"アイスブレイク",time:"〜15分",people:"6〜15人",diff:"やさしい",prep:"不要",purpose:"初対面のメンバー同士が名前と顔を一致させること",design:["前の人を紹介してから自分を名乗る形式にすることで、相手の話を注意深く見る動機が生まれる","人数が増えると記憶の負荷が上がるので適度な緊張感も出る","紹介項目もゲーム難易度の調整だと考えると増やしやすい"],flow:["円になって座る","1人目が手話で自己紹介する（名前＋一言）","2人目は1人目を紹介してから自分を名乗る","3人目は1人目・2人目を紹介してから自分を名乗る","これを人数分繰り返し、一周するまで続ける"],schedule:{total:"20分",steps:[{label:"ルール説明・スタッフ例",min:"5分"},{label:"自己紹介リレー1周",min:"10分"},{label:"振り返り",min:"5分"}]},tips:["5〜6人で1グループにすると記憶の負担が適度。","自己紹介項目に手話ネームなどを含めると今後の交流に生かせるかも。"],materials:"特になし"},
-  {id:2,title:"共通点を見つけよう",catch:"大人数でのチーム分けをするときに使える企画。",major:"交流系",minor:"アイスブレイク",time:"〜15分",people:"16人〜",diff:"やさしい",prep:"不要",purpose:"自己紹介×チーム分けをすること",design:"「共通点を探す」という目的をベースで自己紹介をスムーズに実施できる",flow:["共通点カードを配る(食べ物カード「うどん」「ラーメン」など)","制限時間内で歩き回る","一人一人と自己紹介して相手のカードを尋ねる","一致した人とチームになる","チームが結成出来たらその場でトーク","制限時間になったら終了"],schedule:{total:"15分",steps:[{label:"カード配布+ルール説明",min:"5分"},{label:"ペアで共通点探し(参加人数により時間変動)",min:"10分"}]},tips:["あくまでチーム分け用の企画なので大人数の交流会における最初の企画などに向いている","初心者の動向を注意深く見守り、いつでもサポートできるようにしておくとよい"],materials:"共通点カード"},
-  {id:3,title:"指文字しりとり",catch:"指文字を覚えるための初心者向けゲーム",major:"交流系",minor:"ゲーム",time:"〜15分",people:"人数不問",diff:"やさしい",prep:"不要",purpose:"指文字を覚えること",design:["誰でも知っている「しりとり」を使うことでルール説明を簡略化したゲーム体験ができる","とにかく指文字を表す、読み取ることで身に着ける"],flow:["チームで別れて円になる","スタッフが最初の文字を発表","最初の文字から始まる単語を指文字で表現する","次の人はその単語の最後の文字から始まる単語を指文字で表現する","制限時間内で繰り返し"],schedule:{total:"15分",steps:[{label:"ルール説明",min:"3分"},{label:"1周目（食べ物縛りなど）",min:"5分"},{label:"2周目（テーマ変更）",min:"5分"},{label:"振り返り",min:"2分"}]},tips:["「食べ物縛り」「動物縛り」でテーマを絞ると単語を決めやすくなる","声なしにすると読み取り勉強にもなる","出せた単語数でチーム対抗にするとモチベーションにもなるかも"],materials:"特になし"},
-  {id:4,title:"歯車トーク",catch:"1対1のトークを繰り返す純度高めなトーク企画",major:"交流系",minor:"トーク",time:"〜1時間",people:"6〜15人",diff:"やさしい",prep:"不要",purpose:"複数の相手と1対1でじっくり話すこと",design:["歯車の回転のように会話相手が変わっていくので複数人の相手と話せる","1対1なので置いていかれづらい"],flow:["椅子を2列に向かい合わせて並べて座る","一定時間、目の前の相手と手話で会話する","一定時間経過したら片側の列が1席ずつ移動する","新しい相手と会話する","これを繰り返す"],schedule:{total:"40分",steps:[{label:"ルール説明",min:"5分"},{label:"会話①",min:"10分"},{label:"会話②",min:"10分"},{label:"会話③",min:"10分"},{label:"まとめコメント",min:"5分"}]},tips:["初心者がいる場合は企画担当者が付いてサポートするとよい","まとめコメントで新しく覚えた手話などを司会から共有すると勉強にもなる"],materials:"特になし"},
-  {id:5,title:"ジェスチャーゲーム",catch:"手話を使わずジェスチャーだけで伝える。違いを体感しつつ初心者も参加しやすい形式に。",major:"交流系",minor:"ゲーム",time:"〜15分",people:"6〜15人",diff:"やさしい",prep:"必要",purpose:"ジェスチャーと手話の違いを体感すること\n非言語コミュニケーションへの意識を高めること",design:["あえて手話禁止にすることで、普段の手話表現がいかに体系的・効率的かを逆説的に理解できる。","あえて手話禁止にすることでレベル差によらない交流が生まれる。"],flow:["チーム分け","回答者1名を決める","回答者1名のみ反対側を向き、出題者たちは順番にスタッフの出したお題をジェスチャーで表現","制限時間内に何問正解できたをカウント","数回繰り返し、最も正解数が多いチームが優勝"],schedule:{total:"15分",steps:[{label:"ルール説明・チーム分け",min:"3分"},{label:"出題ラウンド",min:"10分"},{label:"手話との比較トーク",min:"2分"}]},tips:"ルールに声なしを含めておくと聞こえ・手話練度による交流の断絶が発生しづらい",materials:"お題カード"},
-  {id:6,title:"伝言ゲーム",catch:"さまざまなコミュニケーション方法で意思疎通を図ろう！",major:"交流系",minor:"その他",time:"〜15分",people:"人数不問",diff:"ふつう",prep:"不要",purpose:"非音声コミュニケーション方法を認知すること",design:"手話以外のコミュニケーションを複数回×複数種類試すことで知識だけではなく経験とセットで覚えられる",flow:["チーム分け","1列に並ぶ","スタッフがコミュニケーション方法を発表","スタッフが先頭の人にテーマを伝える","最後尾の人が伝わった内容を発表","答え合わせ","繰り返し"],schedule:{total:"30分",steps:[{label:"ルール説明",min:"3分"},{label:"テーマ①「指文字」",min:"8分"},{label:"テーマ②「空書」",min:"8分"},{label:"テーマ③「口話」",min:"8分"},{label:"まとめコメント",min:"3分"}]},tips:"最初にコミュニケーション方法を説明しておくとよい(指文字、空書、口話、ジェスチャー、キュード、触手話など)",materials:"特になし"},
-  {id:7,title:"手話プレゼンバトル",catch:"お題について手話で2分間プレゼン。表現力の総合格闘技",major:"学習系",minor:"表現練習",time:"〜1時間",people:"6〜15人",diff:"しっかり",prep:"必要",purpose:"構成力・表現力・即興力を総合的に磨くこと",design:["1分という制限が「何を伝え、何を捨てるか」の判断を迫る","投票制にすることで、伝わったかどうかの客観的フィードバックが得られる"],flow:["チーム分け","お題を発表（例：「おすすめの映画」「無人島に持っていく3つ」）","チーム内で発表者+発表内容を相談","1人ずつ2分間の手話プレゼン","聴衆が「わかりやすさ」「面白さ」「表現力」で投票","結果発表＆講評"],schedule:{total:"60分",steps:[{label:"ルール説明",min:"5分"},{label:"準備",min:"15分"},{label:"プレゼン＋投票",min:"30分"},{label:"結果発表・振り返り",min:"10分"}]},tips:["初心者が参加する場合は準備時間を長くするとよい","投票はMentimeter等のアプリを使うとリアルタイムに盛り上がる","スタッフは30秒程度のバージョンで例を出すとよい"],materials:"タイマー、投票用紙 or アプリ"},
-  {id:8,title:"手話動画クイズ",catch:"手話動画の内容を読み取って答えるクイズ",major:"学習系",minor:"読取練習",time:"〜30分",people:"人数不問",diff:"ふつう",prep:"必要",purpose:"読取力を鍛えること",design:"動画素材を使うことで、生の手話に近い速度・表現に触れられる。クイズ形式にすることで「正確に読み取ろう」という集中力が生まれる。",flow:["プロジェクターで手話動画を再生","手話動画に基づいたクイズを出題","クイズの答えを相談","正解発表","解説（どの表現がポイントだったか）"],schedule:{total:"30分",steps:[{label:"説明",min:"3分"},{label:"初級問題×3",min:"10分"},{label:"中級問題×2",min:"10分"},{label:"上級問題×1",min:"7分"}]},tips:["難易度別に用意すると参加のハードルが下がる","受動的な企画になりやすいので答えを相談しやすいお題設計が重要"],materials:"プロジェクター、PC、手話動画（事前編集）"},
-  {id:9,title:"CL表現お絵描き対決",catch:"CL表現=空間描写能力でチャレンジ",major:"学習系",minor:"文法",time:"〜30分",people:"6〜15人",diff:"しっかり",prep:"必要",purpose:"CLによる空間表現の理解を深めること\n見たものを正確に解釈する力を育てること",design:["絵に描くというアウトプットを課すことで、CLの読み取りが「なんとなく分かった」で終わらず、正確な理解が求められる。","絵を描かせるという目的を課すことで自分のCL表現が「どれくらい分かりやすいか」を確認できる"],flow:["CLの簡単な説明（初回のみ）","出題者がCLで形状・動きを表現","回答者がそれを見て絵を描く","絵と正解を比較","解説＆ポイント共有"],schedule:{total:"30分",steps:[{label:"CLの説明",min:"5分"},{label:"練習問題",min:"10分"},{label:"本番",min:"10分"},{label:"振り返り",min:"5分"}]},tips:["最初にCL説明を導入することが重要","「車が坂を上る」レベルの練習問題から始めるとよい","解説なしだと単なるイラスト遊びに終始しやすいので解説部分が重要"],materials:"ホワイトボード or 紙、マーカー、お題となるイラスト"},
-  {id:10,title:"謎解きゲーム",catch:"5つの謎を解いて鍵の番号を当て、宝箱を開ける参加型謎解き",major:"交流系",minor:"ゲーム",time:"〜1時間",people:"16人〜",diff:"しっかり",prep:"必要",purpose:"ジェスチャー・選択肢クイズ・手話表現の読み取りなど多様な謎を通して参加者全員が協力する一体感を作ること",design:["5問の謎を順に出題し、各問の正解の文字を集めると鍵の番号が完成する設計","謎の種類（ジェスチャー、ASL手話、手話分類クイズ、なぞなぞ等）を意図的にバラけさせ、誰かしらが活躍できる場面を作る","正解した謎のみヒント文字が獲得できるルールで集中力を維持"],flow:["チーム分け","スタッフが世界観を説明（閉じ込められた！鍵を隠した、など）","謎①〜⑤に順番に挑戦（ジェスチャーで答える、選択肢から選ぶ、手話単語の意味当てなど）","各問正解時のみヒントとして鍵番号の1文字を公開","挑戦し終わったら取得したヒントをもとに相談","鍵を見つけられたらゲームクリア"],schedule:{total:"60分",steps:[{label:"導入説明",min:"5分"},{label:"謎①〜⑤に挑戦",min:"30分"},{label:"場所推理・捜索",min:"15分"},{label:"脱出成功したか！？",min:"10分"}]},tips:["謎コーナーはミニゲームのイメージでブースのように部屋の各所に設置する","ミニゲーム内での手話難易度をバラバラにすることが重要"],materials:"鍵的な物体、各ミニゲーム"},
-  {id:11,title:"魂の単語合戦",catch:"テーマに沿う手話単語を出し合うグループ対抗単語数バトル",major:"学習系",minor:"表現練習",time:"〜30分",people:"6〜15人",diff:"ふつう",prep:"不要",purpose:"語彙数を強化すること",design:["とにかく単語数が企画内で上昇するような形に設計する","同じ単語を出せない制約を課すことによって珍しい単語を出そうとする工夫も引き出す"],flow:["チーム分け","お題（食べ物の手話／パーの形の手話／動物の手話など）を発表","5分間で出した単語をメモに書く（表し方も全員で確認）","対戦グループと交代で1単語ずつ出し合う（同じ単語は出せない）","多くの単語を出したグループが勝ち","お題を変えて繰り返す"],schedule:{total:"45分",steps:[{label:"説明・スタッフ例",min:"5分"},{label:"お題①（相談8分＋対戦7分）",min:"15分"},{label:"お題②",min:"15分"},{label:"まとめ+珍しかった単語を取り上げ",min:"10分"}]},tips:["「手の形」（パー、チョキ、指文字「い」など）と「カテゴリ」（食べ物、動物、顔に触れる手話など）の2系統で切り口を用意","相談時に表現を全員で確認する時間を必ず取ると初心者も置いていかれない","単語を出し合うときも指文字を忘れずに。できれば一つ一つホワイトボードに書かれていることが望ましい。"],materials:"メモ用紙"},
-  {id:12,title:"すごろくゲーム",catch:"お題マスで手話表現にチャレンジしながら進むグループすごろく",major:"交流系",minor:"ゲーム",time:"〜30分",people:"6〜15人",diff:"やさしい",prep:"必要",purpose:"非競争型でゆっくりと交流すること",design:"「競わない・のんびり進める」という方針で勝敗ではなく交流を主目的にする",flow:["チーム分け","すごろくセットを配布","止まったマスのお題（手話で文章を表す・なぞなぞ・早口言葉など）に挑戦","制限時間まで継続"],schedule:{total:"30分",steps:[{label:"ルール説明",min:"3分"},{label:"すごろく進行",min:"25分"},{label:"まとめコメント",min:"2分"}]},tips:"お題例：「好きな食べ物を手話表現しよう」「となりの人の名前を指文字で表現しよう」「スタッフの指文字を読み取ろう」「じゃんけんして負けたら1マス戻る」「1分以内にテの形の手話を5つ表現しよう」などなど",materials:"すごろくセット"},
-  {id:13,title:"手話ネームを作ろう",catch:"手話ネームがまだない人たちのための交流企画",major:"交流系",minor:"アイスブレイク",time:"〜30分",people:"6〜15人",diff:"やさしい",prep:"不要",purpose:"手話ネームを決定して今後の交流をしやすくすること",design:["手話ネームとあだ名の違いを知り、ろう文化の一部を知る","手話ネームを決める過程で対象者の個性を知る"],flow:["手話ネームとあだ名の違いを説明","対象者にインタビュー","手話ネームを決める"],schedule:{total:"30分",steps:[{label:"手話ネームについて説明",min:"5分"},{label:"インタビュー+相談",min:"10分"},{label:"インタビュー+相談(人数分）",min:"10分"},{label:"まとめコメント",min:"5分"}]},tips:["手話ネームは言葉で説明すると分かりづらいため、例を複数出すとよい","本人の意向を無視した進行は厳禁"],materials:"特になし"},
-  {id:14,title:"NGワードトーク",catch:"自分のNGワードを言わないようトークするスリル満点ゲーム",major:"交流系",minor:"ゲーム",time:"〜1時間",people:"人数不問",diff:"ふつう",prep:"必要",purpose:"自分に見えないNGワードを言わないよう緊張感を持ちつつトークすること",design:["自分のNGワードが見えない仕組みでスリルを生む","トークテーマを変えて複数回挑戦できる","他の人にNGワードを誘導する駆け引きも可能"],flow:["NGワードカードを自分から見えないように示す","グループ内で自己紹介＋トークテーマで会話","自分のNGワードを言ったらアウト、カードを外す","言わなければカードゲット","繰り返し"],schedule:{total:"55分",steps:[{label:"ルール説明・例示",min:"10分"},{label:"1回目（好きな季節）",min:"12分"},{label:"2回目（休日の過ごし方）",min:"12分"},{label:"3回目（今年度頑張りたいこと）",min:"12分"},{label:"結果発表・まとめ",min:"9分"}]},tips:["他の人がNGワードを表したら指摘してあげる","NGワードを言った後の過ごし方が欠点"],materials:"NGワードカード"},
-  {id:15,title:"手話でディベート！",catch:"手話を用いた討論！最高難易度の企画",major:"学習系",minor:"表現練習",time:"〜1時間",people:"6〜15人",diff:"しっかり",prep:"必要",purpose:"論理的思考能力と手話の読取+表現力に挑戦すること",design:["テーマ次第で見ているだけでも勉強になる","議論を進めるためには手話表現緑が必要","議論を進めるために手話読取力も必要"],flow:["ディベータ―と審判を決める","テーマを発表","ディベート","審判が投票","審判の投票結果を発表","まとめ"],schedule:{total:"60分",steps:[{label:"ルール説明+テーマ発表",min:"10分"},{label:"10分",min:"ディベート"},{label:"5分",min:"結果発表"},{label:"10分",min:"ディベート2"},{label:"5分",min:"結果発表"},{label:"まとめ",min:"10分"}]},tips:["審判は奇数にしておくとよい","ディベートとディスカッションの違いを説明しておくとよい","審判は自分の思想を持ち込まずあくまで話し方と評価するとよい","チームで相談タイムを設けるなどをしても面白い"],materials:"ディベートテーマ"},
-  {id:16,title:"この呪われし我が手…条件付きトーク",catch:"片手手話や全力手話など6つの条件付きでトークを楽しむ企画",major:"交流系",minor:"トーク",time:"〜1時間",people:"人数不問",diff:"ふつう",prep:"不要",purpose:"条件付きトークを通じて、普段とは違う表現方法に挑戦しながら交流を楽しむこと",design:["6つの条件から自分で選ぶことで主体性を持たせる","片手手話など普段できない条件で表現の幅を広げる","3回繰り返し、毎回違う条件に挑戦してもらう"],flow:["条件（面白い話・笑顔・片手手話・全力手話・話終わりにポーズなど）を発表","好きな条件に移動しグループを作る","自己紹介後、条件を守ってトーク","別の条件に移動して2回目","また別の条件に移動して3回目"],schedule:{total:"60分",steps:[{label:"ルール説明・例示",min:"10分"},{label:"1回目トーク",min:"15分"},{label:"2回目トーク",min:"15分"},{label:"3回目トーク",min:"15分"},{label:"まとめ",min:"5分"}]},tips:"条件は何でもよいがハラスメントにならないソフトなものがよい",materials:"特になし"},
-  {id:17,title:"バトルあり、交渉ありの新福笑い",catch:"じゃんけんと交渉で顔のパーツを集めて福笑いを作る対抗戦",major:"交流系",minor:"ゲーム",time:"〜1時間",people:"16人〜",diff:"ふつう",prep:"必要",purpose:"幅広い人ととの交流+グループワークをの楽しむこと",design:["個人戦と団体戦の2段階で違う楽しみ方ができる","交渉という手話表現を活発に使う場面を作る","得点の見える化（顔の数）で達成感を演出"],flow:["グループに分かれる","個人戦：相手とじゃんけんし、勝ったらパーツを1つもらう","グループに集合してパーツを確認","グループ戦：他グループと欲しいパーツ・あげてもよいパーツを伝え合う","交渉してパーツを交換","交渉相手を変えてもう1回","顔がいくつできたか数えて優勝決定"],schedule:{total:"60分",steps:[{label:"ルール説明（個人戦）",min:"5分"},{label:"個人戦",min:"10分"},{label:"ルール説明（グループ戦）＋例示",min:"10分"},{label:"1回目交渉",min:"10分"},{label:"2回目交渉",min:"10分"},{label:"結果発表・まとめ",min:"10分"}]},tips:["個人戦部分は自己紹介を含めてもよい","福笑い部分はパーツを集めて完成する者であれば福笑いではなくてもよい"],materials:"顔パーツ（目、鼻、口、眉、顔など）のセット"},
-  {id:18,title:"背中の単語はな～んだ！",catch:"自分の背中に貼られた単語を推測して当てる推測ゲーム",major:"交流系",minor:"ゲーム",time:"〜30分",people:"人数不問",diff:"やさしい",prep:"必要",purpose:"たくさんの人と軽く交流すること\nチーム分け",design:"ヒントを得るためにたくさん人に話しかける動機を作成する",flow:["スタッフが背中に単語カードを貼り付ける","自由に歩き回る","出会った人と自己紹介をする","出会った人に1問だけ質問をすることができる","自分と同じテーマを持っていると思う人とチームになる","制限時間になるまでこれを繰り返す"],schedule:{total:"30分",steps:[{label:"ルール説明",min:"5分"},{label:"歩き回り",min:"20分"},{label:"正解確認・まとめ",min:"5分"}]},tips:["初心者がいる場合は質問方法の選択肢を用意するのもあり（ジェスチャーで表して！どんな時に使うもの？）","カードのテーマをあらかじめ発表するのもあり","チーム分けの企画なので大規模な交流会の最初に実施する"],materials:"単語カード"},
-  {id:19,title:"朝までそれ正解！",catch:"どこかのテレビで見たパロディ企画のパロディ",major:"交流系",minor:"ゲーム",time:"〜30分",people:"6〜15人",diff:"やさしい",prep:"不要",purpose:"話し相手のセンスを探り合いながら交流すること",design:"特定のテーマに従いながら案を出し続けることで相手の特性なども知りつつ交流を深めることができる",flow:["グループに分かれる","テーマを発表（「え」から始まる便利なものは？など）","テーマに基づいて複数名でトーク","みんなが納得できる答えを決める","グループの答えを見て最も納得できる答えを見てコメント"],schedule:{total:"30分",steps:[{label:"ルール説明",min:"5分"},{label:"テーマ発表①+トーク①",min:"10分"},{label:"テーマ発表②+トーク②",min:"10分"},{label:"まとめコメント",min:"5分"}]},tips:"ゆるゆるした企画なので大人数には不向き",materials:"特になし"},
-  {id:20,title:"ディスカッション",catch:"5つのテーマから選び、興味の近い仲間と深く語り合う夜",major:"交流系",minor:"トーク",time:"〜1時間",people:"人数不問",diff:"しっかり",prep:"必要",purpose:"自分の思いや疑問を共有することで学びを深めること",design:"テーマを「手話力」「サポート方法」「聴文化とろう文化の違い」「生活で困ること・聞こえ方の違い」「情報保障」など普段触れることのないもので用意",flow:["パンフレットの該当ページに自分の思い・疑問を10分でまとめる","スタッフの合図で1番興味のあるテーマの場所に移動する","同じテーマの仲間と60分間自由にディスカッション","メモ欄に出た意見を残す","感想を共有して終了"],schedule:{total:"75分",steps:[{label:"流れ説明",min:"5分"},{label:"個人で意見まとめ",min:"10分"},{label:"ディスカッション",min:"60分"}]},tips:["参加者層を意識し、ゆっくり表現して確認しながら進める","結論を出すよりも疑問の共有を大切にする","あとから思い出せるようメモを必ず残してもらうとよい"],materials:"メモ用紙、ペン"},
-];
-
-const MINORS = {
-  "交流系": ["アイスブレイク","ゲーム","トーク","その他"],
-  "学習系": ["表現練習","読取練習","文法","その他"],
-};
-const TIMES = ["〜15分","〜30分","〜1時間"];
-const PEOPLES = ["〜5人","6〜15人","16人〜","人数不問"];
-const DIFFS = ["やさしい","ふつう","しっかり"];
-const PREPS = ["不要","必要"];
-const DIFF_COLORS = {"やさしい":"#7A9B7E","ふつう":"#C4944A","しっかり":"#B8533E"};
-</script>
-<script>
-// ─── State ──────────────────────────────────────────────
+// ─── State ─────────
 let filters = { major:null, minor:null, time:null, people:null, diff:null, prep:null };
-let openId = null;
 
-// ─── Render ─────────────────────────────────────────────
-function render() {
-  renderFilters();
-  renderEntries();
-}
+const MAJOR_COLOR_CLASS = { "交流系":"color-blue", "学習系":"color-green" };
+const DIFF_COLOR_CLASS  = { "やさしい":"color-green", "ふつう":"color-yellow", "しっかり":"color-red" };
 
-function renderFilters() {
+function render(){ renderFilters(); renderEntries(); }
+
+function renderFilters(){
   const nav = document.getElementById('filters');
   let html = '';
-  html += filterRow('分類', ['交流系','学習系'].map(v => tagBtn(v, 'major')).join(''));
+  html += filterRow('分類',   ['交流系','学習系'].map(v => chip(v,'major', MAJOR_COLOR_CLASS[v])).join(''));
   if (filters.major) {
-    html += filterRow('種別', MINORS[filters.major].map(v => tagBtn(v, 'minor')).join(''));
+    html += filterRow('種別',  MINORS[filters.major].map(v => chip(v,'minor')).join(''));
   }
-  html += filterRow('時間', TIMES.map(v => tagBtn(v, 'time')).join(''));
-  html += filterRow('人数', PEOPLES.map(v => tagBtn(v, 'people')).join(''));
-  html += filterRow('難易度', DIFFS.map(v => tagBtn(v, 'diff')).join(''));
-  html += filterRow('準備', PREPS.map(v => tagBtn(v, 'prep')).join(''));
+  html += filterRow('時間',   TIMES.map(v => chip(v,'time')).join(''));
+  html += filterRow('人数',   PEOPLES.map(v => chip(v,'people')).join(''));
+  html += filterRow('難易度', DIFFS.map(v => chip(v,'diff', DIFF_COLOR_CLASS[v])).join(''));
+  html += filterRow('準備',   PREPS.map(v => chip(v,'prep', v==='必要'?'color-red':'')).join(''));
   const hasFilter = Object.values(filters).some(v => v !== null);
-  html += `<button class="reset-btn ${hasFilter ? 'visible' : ''}" onclick="clearFilters()">絞り込みをリセット</button>`;
+  html += `<div></div><div><button class="reset-btn ${hasFilter?'visible':''}" onclick="clearFilters()">絞り込みをリセット</button></div>`;
   nav.innerHTML = html;
 }
-
-function filterRow(label, btns) {
-  return `<div class="filter-row"><span class="filter-label">${label}</span><div class="filter-group">${btns}</div></div>`;
+function filterRow(label, btns){
+  return `<div class="filter-label">${label}</div><div class="filter-group">${btns}</div>`;
 }
-
-function tagBtn(value, key) {
+function chip(value, key, extraClass=''){
   const active = filters[key] === value ? ' active' : '';
-  return `<button class="tag-btn${active}" onclick="toggleFilter('${key}','${value}')">${value}</button>`;
+  return `<button class="chip ${extraClass}${active}" onclick="toggleFilter('${key}','${value}')">${value}</button>`;
 }
-
-function toggleFilter(key, value) {
-  if (filters[key] === value) { filters[key] = null; }
-  else { filters[key] = value; }
-  if (key === 'major') filters.minor = null;
-  openId = null;
+function toggleFilter(key, value){
+  filters[key] = filters[key] === value ? null : value;
+  if (key==='major') filters.minor = null;
   render();
 }
-
-function clearFilters() {
+function clearFilters(){
   filters = { major:null, minor:null, time:null, people:null, diff:null, prep:null };
-  openId = null;
   render();
 }
-
-function getFiltered() {
+function getFiltered(){
   return ACTIVITIES.filter(a => {
     if (filters.major && a.major !== filters.major) return false;
     if (filters.minor && a.minor !== filters.minor) return false;
@@ -758,103 +944,114 @@ function getFiltered() {
   });
 }
 
-// roman numerals for nums
-function toRoman(n) {
-  const map = [[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
-  let out = '';
-  for (const [v,s] of map) { while (n>=v) { out+=s; n-=v; } }
-  return out;
-}
-
-function renderEntries() {
+function renderEntries(){
   const filtered = getFiltered();
-  const countBig = document.getElementById('count-big');
-  if (countBig) countBig.textContent = filtered.length;
-  document.getElementById('sort-label').textContent =
-    filtered.length === 0 ? '' : `全${filtered.length}件`;
-
+  document.getElementById('count-big').textContent = filtered.length;
+  document.getElementById('sort-label').textContent = `全${filtered.length}件`;
   const main = document.getElementById('entries');
-  if (filtered.length === 0) {
-    main.innerHTML = '<p class="empty">条件に合う企画はありません</p>';
+  if (filtered.length === 0){
+    main.innerHTML = '<div class="empty">条件に合う企画は みつかりませんでした</div>';
     return;
   }
-  main.innerHTML = filtered.map((a, i) => {
-    const isOpen = openId === a.id;
-    const ribbonColor = DIFF_COLORS[a.diff];
-    const num = String(i+1).padStart(2, '0');
+  main.innerHTML = filtered.map((a,i) => {
+    const num = String(i+1).padStart(2,'0');
     return `
-    <article class="entry" style="animation-delay:${i*0.03}s">
-      <div class="entry-row ${isOpen?'is-open':''}" onclick="toggleEntry(${a.id})">
-        <div class="ribbon" style="background:${ribbonColor}"><span>${a.diff}</span></div>
-        <div class="ribbon-cut" style="border-top-color:${ribbonColor}"></div>
-        <div class="entry-num">No.<span class="big">${num}</span></div>
-        <div class="entry-body">
-          <div class="entry-title-row">
-            <h2 class="entry-title">${a.title}</h2>
-            <div class="entry-meta">
-              <span class="ja">${a.major}</span><span class="sep">·</span><span class="ja">${a.minor}</span>
-              <span class="sep">/</span>
-              <span class="ja">${a.time}</span>
-              <span class="sep">·</span>
-              <span class="ja">${a.people}</span>
-              ${a.prep==='必要'?'<span class="prep-tag">準備要</span>':''}
-            </div>
-          </div>
-          <p class="entry-catch">${a.catch}</p>
-        </div>
-        <span class="entry-chev">→</span>
+    <article class="card" style="animation-delay:${i*0.04}s" onclick="openModal(${a.id})">
+      <div class="card-band ${a.major}">
+        <span>${a.major}</span>
+        <span class="minor">${a.minor}</span>
       </div>
-      <div class="detail-panel ${isOpen?'open':''}">
-        <div class="detail-inner">
-          <div class="detail-rail">${toRoman(i+1)}</div>
-          <div class="detail-main">
-            ${detailBlock('目的', a.purpose)}
-            ${detailBlock('企画設計', a.design)}
-            ${flowBlock(a.flow)}
-            ${scheduleBlock(a.schedule)}
-            ${detailBlock('コツ・アレンジ', a.tips)}
-            ${detailBlock('準備するもの', a.materials)}
-          </div>
+      <div class="card-body">
+        <div class="card-num">${num}</div>
+        <div class="card-title-row">
+          <h3 class="card-title">${escapeHtml(a.title)}</h3>
+          <span class="ticket ${a.diff}">${a.diff}</span>
+        </div>
+        <p class="card-catch">${escapeHtml(a.catch)}</p>
+        <div class="card-meta">
+          <span class="meta-pill time">⏱ ${escapeHtml(a.time)}</span>
+          <span class="meta-pill">👥 ${escapeHtml(a.people)}</span>
+          <span class="meta-pill ${a.prep==='必要'?'prep-need':'prep-none'}">準備${a.prep==='必要'?'要':'不要'}</span>
         </div>
       </div>
+      <span class="card-flag">▼ ひらく</span>
     </article>`;
   }).join('');
 }
 
-function detailBlock(label, content) {
+function renderModal(a){
+  const num = String(ACTIVITIES.findIndex(x=>x.id===a.id)+1).padStart(2,'0');
+  return `
+    <div class="card-band ${a.major}">
+      <span>${a.major}</span>
+      <span class="minor">${a.minor}</span>
+    </div>
+    <button class="modal-close" onclick="closeModal()" aria-label="閉じる">×</button>
+    <div class="modal-body">
+      <div class="card-num">${num}</div>
+      <div class="modal-title-row">
+        <h2 class="modal-title">${escapeHtml(a.title)}</h2>
+        <span class="ticket ${a.diff}">${a.diff}</span>
+      </div>
+      <p class="modal-catch">${escapeHtml(a.catch)}</p>
+      <div class="modal-meta">
+        <span class="meta-pill time">⏱ ${escapeHtml(a.time)}</span>
+        <span class="meta-pill">👥 ${escapeHtml(a.people)}</span>
+        <span class="meta-pill ${a.prep==='必要'?'prep-need':'prep-none'}">準備${a.prep==='必要'?'要':'不要'}</span>
+      </div>
+      <div class="modal-detail">
+        ${detailBlock('目的', a.purpose)}
+        ${detailBlock('企画設計', a.design)}
+        ${flowBlock(a.flow)}
+        ${scheduleBlock(a.schedule)}
+        ${detailBlock('コツ・アレンジ', a.tips)}
+        ${detailBlock('準備するもの', a.materials)}
+      </div>
+    </div>`;
+}
+
+function detailBlock(label, content){
   let body;
-  if (Array.isArray(content)) {
-    body = '<ul>' + content.map(c => `<li>${escapeHtml(c)}</li>`).join('') + '</ul>';
-  } else {
-    body = `<p>${escapeHtml(content).replace(/\n/g,'<br>')}</p>`;
-  }
-  return `<div class="detail-block"><div class="detail-label">${label}</div><div class="detail-text">${body}</div></div>`;
+  if (Array.isArray(content)) body = '<ul>' + content.map(c=>`<li>${escapeHtml(c)}</li>`).join('') + '</ul>';
+  else body = `<p>${escapeHtml(content).replace(/\n/g,'<br>')}</p>`;
+  return `<div class="detail-block"><span class="detail-label">${label}</span><div class="detail-text">${body}</div></div>`;
 }
-
-function flowBlock(steps) {
-  const items = steps.map(s => `<li>${escapeHtml(s)}</li>`).join('');
-  return `<div class="detail-block"><div class="detail-label">流れ</div><div class="detail-text"><ol>${items}</ol></div></div>`;
+function flowBlock(steps){
+  const items = steps.map(s=>`<li>${escapeHtml(s)}</li>`).join('');
+  return `<div class="detail-block"><span class="detail-label">流れ</span><div class="detail-text"><ol>${items}</ol></div></div>`;
 }
-
-function scheduleBlock(sched) {
+function scheduleBlock(sched){
   if (!sched) return '';
-  const rows = sched.steps.map((s, i) =>
+  const rows = sched.steps.map((s,i)=>
     `<div class="schedule-row"><span class="schedule-num">${String(i+1).padStart(2,'0')}</span><span>${escapeHtml(s.label)}</span><span class="schedule-time">${escapeHtml(s.min)}</span></div>`
   ).join('');
-  return `<div class="detail-block"><div class="detail-label">タイムスケジュール例<span class="schedule-total">合計 <b>${escapeHtml(sched.total)}</b></span></div><div class="detail-text"><div class="schedule-table">${rows}</div></div></div>`;
+  return `<div class="detail-block"><span class="detail-label">タイムスケジュール例</span><div class="schedule"><div class="schedule-head"><span>合計</span><b>${escapeHtml(sched.total)}</b></div>${rows}</div></div>`;
 }
-
 function escapeHtml(s){
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-
-function toggleEntry(id) {
-  openId = openId === id ? null : id;
-  renderEntries();
+function openModal(id){
+  const a = ACTIVITIES.find(x => x.id === id);
+  if (!a) return;
+  const modal = document.getElementById('modal');
+  document.getElementById('modal-card').innerHTML = renderModal(a);
+  modal.classList.add('is-open');
+  document.body.classList.add('modal-locked');
 }
+function closeModal(event){
+  // overlay クリックで閉じる時は target===overlay の時のみ
+  if (event && event.target && event.currentTarget && event.target !== event.currentTarget && event.type === 'click') {
+    return;
+  }
+  document.getElementById('modal').classList.remove('is-open');
+  document.body.classList.remove('modal-locked');
+}
+// Esc で閉じる
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
 
-// ─── Init ───────────────────────────────────────────────
 document.getElementById('vol-count').textContent = String(ACTIVITIES.length);
 document.getElementById('count-total').textContent = String(ACTIVITIES.length);
 render();
