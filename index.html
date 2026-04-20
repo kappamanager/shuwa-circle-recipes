@@ -3,180 +3,663 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>手話サークル企画レシピ</title>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<title>手話レコ — 手話サークルレクリエーションコレクション</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F2EEE5;
+    --paper: #EFEAE0;
+    --paper-tint: #E9E2D3;
+    --ink: #1F1D1A;
+    --ink-2: #3C3934;
+    --ink-3: #6F6A60;
+    --ink-4: #9A9488;
+    --rule: #C9C2B2;
+    --rule-soft: #D8D1C0;
+    --terra: #B8533E;
+    --terra-deep: #8E3F2E;
+    --terra-ink: #5A271C;
+    --olive: #7A7B4A;
+    --accent-green: #6E8A6A;
+    --accent-amber: #B07C2E;
+  }
+
+  html { background: var(--bg); }
   body {
     min-height: 100vh;
-    background: #F5F2ED;
+    background:
+      radial-gradient(1200px 600px at 8% -10%, rgba(184,83,62,0.045), transparent 60%),
+      radial-gradient(900px 500px at 92% 0%, rgba(122,122,74,0.04), transparent 60%),
+      var(--bg);
+    color: var(--ink);
     font-family: 'Noto Sans JP', sans-serif;
     font-weight: 400;
-    color: #2A2A2A;
     -webkit-font-smoothing: antialiased;
+    letter-spacing: 0.01em;
+    /* paper grain */
+    background-attachment: fixed;
   }
-  ::selection { background: #B8533E; color: #fff; }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+  }
 
-  /* Layout */
-  .container { max-width: 860px; margin: 0 auto; padding: 0 32px; }
-  header { padding: 72px 0 48px; }
-  header h1 {
+  ::selection { background: var(--terra); color: #fff; }
+  a { color: inherit; }
+
+  /* ─── Masthead ────────────────────────────────────────── */
+  .masthead {
+    position: relative;
+    border-bottom: 1px solid var(--ink);
+    background: transparent;
+  }
+  .masthead::before {
+    /* top hairline companion */
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: -4px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .masthead-top {
+    max-width: 1040px; margin: 0 auto; padding: 14px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'EB Garamond', 'Shippori Mincho', serif;
+    font-size: 11px; letter-spacing: 0.22em;
+    color: var(--ink-2); text-transform: uppercase;
+    border-bottom: 1px solid var(--rule);
+  }
+  .masthead-top .left, .masthead-top .right { display: flex; gap: 18px; }
+  .masthead-top .divider { color: var(--ink-4); }
+
+  .masthead-main {
+    max-width: 1040px; margin: 0 auto;
+    padding: 38px 40px 34px;
+    position: relative;
+  }
+  .masthead-row { display: flex; justify-content: center; align-items: center; }
+  .masthead-meta-l, .masthead-meta-r {
+    font-family: 'EB Garamond', serif;
+    font-size: 11px; letter-spacing: 0.18em;
+    color: var(--ink-3); text-transform: uppercase;
+    line-height: 1.9;
+  }
+  .masthead-meta-r { text-align: right; font-style: italic; }
+  .masthead-title {
     font-family: 'Shippori Mincho', serif;
-    font-size: 40px; font-weight: 800;
-    line-height: 1.3; letter-spacing: -0.5px;
-    margin-bottom: 20px;
+    font-weight: 800;
+    font-size: clamp(72px, 11vw, 148px);
+    line-height: 0.88;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    text-align: center;
+    white-space: nowrap;
+    position: relative;
   }
-  .header-desc { font-size: 14px; line-height: 2.2; color: #555; max-width: 500px; }
-  .header-desc p { margin-bottom: 8px; }
-  .header-desc a { color: #B8533E; border-bottom: 1px solid #B8533E; text-decoration: none; }
-  .header-desc a:hover { opacity: 0.7; }
-  .header-line {
-    width: 48px; height: 1px; background: #2A2A2A; margin-top: 36px;
-    animation: revealLine 0.6s ease 0.2s both; transform-origin: left;
+  .masthead-title .dot {
+    color: var(--terra);
+    font-size: 0.35em;
+    vertical-align: 0.75em;
+    margin-left: 0.08em;
+    letter-spacing: 0;
+  }
+  .masthead-sub {
+    max-width: 1040px; margin: 0 auto;
+    padding: 18px 40px 26px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 32px;
+    align-items: start;
+    border-top: 1px solid var(--rule);
+  }
+  .masthead-sub .kicker {
+    font-family: 'Shippori Mincho', serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    color: var(--ink-2);
+    line-height: 2;
+    white-space: nowrap;
+  }
+  .masthead-sub .lede {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14.5px;
+    line-height: 2;
+    color: var(--ink-2);
+    max-width: 540px;
+    justify-self: center;
+  }
+  .masthead-sub .lede .drop {
+    font-size: 17px; font-weight: 600; color: var(--terra);
+    letter-spacing: 0.12em;
+  }
+  .masthead-sub .lede a.cta {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    color: var(--terra); text-decoration: none;
+    border-bottom: 1px solid var(--terra);
+    padding-bottom: 1px;
+    font-weight: 600;
+    transition: color .15s, border-color .15s;
+  }
+  .masthead-sub .lede a.cta::after {
+    content: "↗"; font-size: 0.9em; letter-spacing: 0;
+  }
+  .masthead-sub .lede a.cta:hover { color: var(--terra-deep); border-color: var(--terra-deep); }
+  .masthead-sub .volume {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 12px; letter-spacing: 0.15em;
+    color: var(--ink-3);
+    text-align: right;
+    line-height: 1.9;
+  }
+  .masthead-sub .volume .num {
+    display: block;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 44px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1;
+    font-weight: 400;
+    margin-bottom: 6px;
   }
 
-  /* Filters */
-  .filters { padding-bottom: 40px; }
-  .filter-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-  .filter-label { font-size: 11px; color: #888; font-weight: 500; letter-spacing: 1px; min-width: 44px; flex-shrink: 0; }
-  .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
-  .tag-btn {
-    border: 1px solid #CCC; background: none; cursor: pointer;
-    font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 400;
-    padding: 5px 14px; border-radius: 2px; transition: all 0.15s; color: #666;
+  /* ─── Container ───────────────────────────────────────── */
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 1; }
+
+  /* ─── Filter bar (index) ─────────────────────────────── */
+  .index-bar {
+    position: relative;
+    margin-top: 40px;
+    padding: 28px 0 26px;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    background:
+      linear-gradient(to bottom, rgba(232,224,205,0.55), rgba(232,224,205,0.35)),
+      transparent;
   }
-  .tag-btn:hover { border-color: #888; color: #2A2A2A; }
-  .tag-btn.active { border-color: #2A2A2A; color: #2A2A2A; font-weight: 500; background: rgba(42,42,42,0.04); }
+  /* double rule at bottom */
+  .index-bar::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: -4px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .index-bar-inner {
+    max-width: 1040px; margin: 0 auto; padding: 0 40px;
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    gap: 28px;
+  }
+  .index-bar-label {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 12px; letter-spacing: 0.15em;
+    color: var(--ink-3);
+    border-right: 1px solid var(--rule);
+    padding-right: 16px;
+  }
+  .index-bar-label .ja {
+    display: block;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 17px;
+    letter-spacing: 0.18em;
+    color: var(--ink);
+    margin-top: 6px;
+  }
+  .index-bar-label .count-line {
+    display: block;
+    margin-top: 18px;
+    font-family: 'EB Garamond', serif;
+    font-size: 11px; letter-spacing: 0.2em;
+    color: var(--ink-3);
+  }
+  .index-bar-label .count-line b {
+    font-family: 'Shippori Mincho', serif;
+    font-weight: 600;
+    font-size: 24px;
+    color: var(--ink);
+    letter-spacing: 0;
+  }
+
+  .filters-grid { display: flex; flex-direction: column; gap: 10px; }
+  .filter-row {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .filter-label {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 12px; font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .filter-label::after { content: ""; display: inline-block; flex: 1; border-top: 1px solid var(--rule); }
+  .filter-group { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tag-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 4px 12px;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+    position: relative;
+    transition: color .15s;
+    border-left: 1px solid transparent;
+  }
+  .tag-btn + .tag-btn { border-left: 1px solid var(--rule); }
+  .tag-btn:hover { color: var(--ink); }
+  .tag-btn.active {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .tag-btn.active::after {
+    content: "";
+    position: absolute;
+    left: 12px; right: 12px; bottom: 0px;
+    border-bottom: 1.5px solid var(--terra);
+  }
   .reset-btn {
     border: none; background: none; cursor: pointer;
-    font-size: 12px; color: #B8533E; font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 400; padding: 0; border-bottom: 1px solid #B8533E; margin-top: 16px;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 12px;
+    color: var(--terra);
+    padding: 0; margin-top: 4px;
+    letter-spacing: 0.15em;
     display: none;
+    align-self: flex-start;
   }
-  .reset-btn.visible { display: inline; }
+  .reset-btn::before { content: "× "; font-family: sans-serif; }
+  .reset-btn.visible { display: inline-block; }
+  .reset-btn:hover { color: var(--terra-deep); }
 
-  /* Count */
-  .count { font-size: 12px; color: #888; padding-bottom: 12px; }
-
-  /* Entries */
-  .entry {
-    animation: fadeUp 0.4s ease both;
+  /* ─── Directory ──────────────────────────────────────── */
+  .directory-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 40px 0 14px;
   }
+  .directory-head .section-no {
+    font-family: 'EB Garamond', serif;
+    font-size: 11px; letter-spacing: 0.3em;
+    color: var(--ink-3); text-transform: uppercase;
+  }
+  .directory-head .section-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14px; font-weight: 500;
+    letter-spacing: 0.5em;
+    color: var(--ink);
+  }
+  .directory-head .section-title::before { content: "— "; color: var(--ink-4); margin-right: 4px; }
+  .directory-head .section-title::after { content: " —"; color: var(--ink-4); margin-left: -2px; }
+
+  .empty {
+    color: var(--ink-3);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 15px;
+    padding: 64px 0;
+    border-top: 1px solid var(--ink);
+    text-align: center;
+    letter-spacing: 0.2em;
+  }
+  .empty::before { content: "— "; }
+  .empty::after { content: " —"; }
+
+  /* ─── Entry row ──────────────────────────────────────── */
+  #entries { border-top: 1px solid var(--ink); }
+  .entry { animation: fadeUp 0.4s ease both; }
   .entry-row {
-    border-top: 1px solid #DDD; padding: 28px 48px 28px 0;
-    cursor: pointer; transition: background 0.12s; position: relative;
+    border-bottom: 1px solid var(--rule);
+    padding: 26px 56px 26px 0;
+    cursor: pointer;
+    position: relative;
+    transition: background .15s;
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 24px;
+    align-items: baseline;
   }
-  .entry-row:hover { background: rgba(42,42,42,0.02); }
-  .entry-title-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
-  .entry-title {
-    font-family: 'Shippori Mincho', serif; font-size: 22px; font-weight: 600;
-    letter-spacing: 0.5px; transition: color 0.15s;
-  }
-  .entry-title.open { color: #B8533E; }
-  .entry-meta { display: flex; gap: 12px; font-size: 11px; color: #888; font-weight: 400; flex-wrap: wrap; }
-  .entry-meta .sep { color: #DDD; }
-  .entry-meta .prep-tag { color: #B8533E; }
-  .entry-catch { font-size: 13px; line-height: 1.9; color: #666; margin-top: 8px; }
+  .entry-row:hover { background: rgba(31,29,26,0.025); }
+  .entry-row:hover .entry-title { color: var(--terra-ink); }
+  .entry-row.is-open { background: transparent; }
+  .entry-row.is-open .entry-title { color: var(--terra); }
 
-  /* Ribbon */
+  .entry-num {
+    font-family: 'EB Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--ink-4);
+    text-align: left;
+    line-height: 1.6;
+    padding-top: 2px;
+    font-feature-settings: "tnum";
+  }
+  .entry-num .big {
+    display: block;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 32px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1;
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  .entry-body { min-width: 0; }
+  .entry-title-row {
+    display: flex; justify-content: space-between;
+    align-items: baseline; gap: 18px; flex-wrap: wrap;
+  }
+  .entry-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 24px; font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+    transition: color .15s;
+  }
+  .entry-meta {
+    display: flex; gap: 10px;
+    font-family: 'EB Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    flex-wrap: wrap;
+    align-items: baseline;
+  }
+  .entry-meta .ja { font-family: 'Noto Sans JP', sans-serif; letter-spacing: 0.1em; }
+  .entry-meta .sep { color: var(--ink-4); }
+  .entry-meta .prep-tag {
+    color: var(--terra);
+    border: 1px solid var(--terra);
+    padding: 1px 6px;
+    letter-spacing: 0.12em;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+  }
+  .entry-catch {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--ink-2);
+    margin-top: 10px;
+    max-width: 720px;
+  }
+  .entry-chev {
+    position: absolute; right: 0; top: 30px;
+    font-family: 'EB Garamond', serif;
+    color: var(--ink-3);
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    transition: color .15s, transform .2s;
+  }
+  .entry-row:hover .entry-chev { color: var(--terra); }
+  .entry-row.is-open .entry-chev { color: var(--terra); transform: rotate(90deg) translateX(2px); }
+
+  /* Ribbon (difficulty bookmark) */
   .ribbon {
-    position: absolute; right: 0; top: -1px;
-    width: 24px; height: 52px;
-    border-radius: 0 0 3px 3px;
+    position: absolute; right: 14px; top: -1px;
+    width: 22px; height: 58px;
     display: flex; align-items: flex-start; justify-content: center;
     padding-top: 6px;
+    box-shadow: -1px 0 0 rgba(0,0,0,0.08) inset;
   }
   .ribbon span {
-    writing-mode: vertical-rl; font-size: 9px; font-weight: 700;
-    color: #fff; letter-spacing: 2px;
+    writing-mode: vertical-rl;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.15em;
+    white-space: nowrap;
   }
   .ribbon-cut {
-    position: absolute; right: 0; top: 51px;
+    position: absolute; right: 14px; top: 57px;
     width: 0; height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
   }
 
-  /* Detail panel */
+  /* ─── Detail panel ───────────────────────────────────── */
   .detail-panel {
-    padding: 20px 24px 32px 24px;
-    border-left: 2px solid #B8533E;
-    background: rgba(42, 42, 42, 0.025);
-    margin-left: -1px; margin-right: -1px;
-    animation: fadeUp 0.3s ease;
     display: none;
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper);
+    animation: fadeUp .3s ease;
+    position: relative;
   }
   .detail-panel.open { display: block; }
+  .detail-panel::before {
+    content: "";
+    position: absolute; left: 72px; top: 0; bottom: 0; width: 1px;
+    background: var(--rule-soft);
+  }
+  .detail-inner {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 24px;
+    padding: 28px 56px 36px 0;
+  }
+  .detail-rail {
+    font-family: 'EB Garamond', serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--ink-4);
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    align-self: start;
+    padding-top: 4px;
+  }
+  .detail-main { min-width: 0; padding-left: 24px; }
+
+  .detail-block { margin-bottom: 26px; }
+  .detail-block:last-child { margin-bottom: 0; }
   .detail-label {
-    font-size: 11px; font-weight: 700; letter-spacing: 2px;
-    color: #B8533E; margin-bottom: 6px;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.4em;
+    color: var(--terra);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px;
   }
-  .detail-text { font-size: 13px; line-height: 2; color: #444; margin-bottom: 20px; }
-  .detail-text ul {
-    margin: 0; padding-left: 16px; line-height: 2.2; list-style-type: '・';
+  .detail-label::before {
+    content: ""; width: 18px; height: 1px; background: var(--terra);
   }
-  .detail-text ol {
-    margin: 0; padding-left: 24px; line-height: 2.2; list-style-type: decimal;
+  .detail-text {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14px;
+    line-height: 2;
+    color: var(--ink-2);
   }
-  .detail-text li { padding-left: 4px; }
-  .schedule-step { display: flex; gap: 12px; line-height: 2; }
-  .schedule-num { color: #AAA; min-width: 20px; text-align: right; }
-  .schedule-time { color: #AAA; }
+  .detail-text p { margin: 0; }
+  .detail-text ul, .detail-text ol { margin: 0; padding-left: 20px; line-height: 2.1; }
+  .detail-text ul { list-style: none; padding-left: 0; }
+  .detail-text ul li { position: relative; padding-left: 22px; }
+  .detail-text ul li::before {
+    content: "";
+    position: absolute; left: 0; top: 0.95em;
+    width: 10px; height: 1px; background: var(--ink-4);
+  }
+  .detail-text ol { padding-left: 28px; }
+  .detail-text ol li { padding-left: 6px; }
+  .detail-text ol li::marker { color: var(--terra); font-weight: 600; }
 
-  /* Empty state */
-  .empty { color: #AAA; font-size: 14px; padding: 48px 0; border-top: 1px solid #DDD; }
+  /* Schedule table */
+  .schedule-table {
+    border-top: 1px solid var(--rule);
+    margin-top: 4px;
+  }
+  .schedule-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 70px;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 13.5px;
+    align-items: baseline;
+  }
+  .schedule-num {
+    font-family: 'EB Garamond', serif;
+    font-size: 12px;
+    color: var(--ink-4);
+    letter-spacing: 0.1em;
+  }
+  .schedule-time {
+    font-family: 'EB Garamond', serif;
+    font-size: 12px;
+    color: var(--ink-3);
+    text-align: right;
+    letter-spacing: 0.12em;
+  }
+  .schedule-total {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    margin-left: 12px;
+  }
+  .schedule-total b {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--ink);
+    font-weight: 600;
+    letter-spacing: 0;
+    font-size: 14px;
+  }
 
-  /* Footer */
-  footer { border-top: 1px solid #DDD; padding: 32px 0 48px; }
-  footer p { font-size: 11px; color: #CCC; letter-spacing: 3px; font-weight: 400; }
+  /* ─── Footer ─────────────────────────────────────────── */
+  footer {
+    border-top: 2px solid var(--ink);
+    margin-top: 72px;
+    padding: 32px 0 60px;
+    position: relative;
+  }
+  footer::before {
+    content: "";
+    position: absolute; left: 0; right: 0; top: -4px;
+    border-top: 1px solid var(--ink);
+  }
+  .footer-inner {
+    max-width: 1040px; margin: 0 auto; padding: 0 40px;
+    display: flex; justify-content: center; align-items: baseline;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 11px; letter-spacing: 0.28em;
+    color: var(--ink-3); text-transform: uppercase;
+  }
+  .footer-inner .mark {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14px; font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.4em;
+  }
+  .footer-inner .mark .dot { color: var(--terra); }
 
   /* Animations */
-  @keyframes revealLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
 
   /* Responsive */
-  @media (max-width: 480px) {
-    header h1 { font-size: 28px; }
-    .ribbon { width: 20px !important; height: 60px !important; padding-top: 4px !important; padding-bottom: 0 !important; }
-    .ribbon span { font-size: 9px !important; letter-spacing: 0 !important; line-height: 1.1 !important; }
-    .ribbon-cut { top: 59px !important; border-left-width: 10px !important; border-right-width: 10px !important; border-top-width: 6px !important; }
-    .entry-row { padding-right: 36px !important; }
-    .entry-title { font-size: 18px; }
+  @media (max-width: 720px) {
+    .masthead-top { padding: 10px 20px; font-size: 9.5px; gap: 10px; flex-wrap: wrap; }
+    .masthead-top .left, .masthead-top .right { gap: 10px; }
+    .masthead-main { padding: 28px 20px 24px; }
+    .masthead-row { grid-template-columns: 1fr; gap: 14px; }
+    .masthead-meta-l, .masthead-meta-r { display: none; }
+    .masthead-title { font-size: clamp(54px, 22vw, 96px); }
+    .masthead-sub { grid-template-columns: 1fr; gap: 18px; padding: 16px 20px 22px; }
+    .masthead-sub .kicker { text-align: center; white-space: normal; }
+    .masthead-sub .volume { display: none; }
+    .masthead-sub .lede { font-size: 13.5px; line-height: 1.95; }
+
+    .wrap { padding: 0 20px; }
+    .index-bar-inner { grid-template-columns: 1fr; padding: 0 20px; gap: 14px; }
+    .index-bar-label { border-right: none; border-bottom: 1px solid var(--rule); padding: 0 0 12px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .index-bar-label .ja { margin-top: 0; font-size: 15px; letter-spacing: 0.15em; }
+    .index-bar-label .count-line { margin-top: 0; }
+    .filter-row { grid-template-columns: 54px 1fr; gap: 10px; }
+    .filter-label { font-size: 11px; letter-spacing: 0.2em; }
+    .filter-label::after { display: none; }
+
+    .entry-row { grid-template-columns: 46px 1fr; gap: 14px; padding-right: 42px; padding-top: 22px; padding-bottom: 22px; }
+    .entry-num .big { font-size: 24px; }
+    .entry-title { font-size: 19px; }
+    .entry-meta { font-size: 10px; gap: 8px; }
+    .ribbon { right: 10px; width: 18px; height: 62px; padding-top: 6px; }
+    .ribbon span { font-size: 9.5px; letter-spacing: 0.05em; }
+    .ribbon-cut { right: 10px; top: 61px; border-left-width: 9px; border-right-width: 9px; border-top-width: 6px; }
+    .detail-inner { grid-template-columns: 1fr; padding: 20px 16px 28px; gap: 14px; }
+    .detail-panel::before { display: none; }
+    .detail-rail { writing-mode: horizontal-tb; }
+    .detail-main { padding-left: 0; }
+    .schedule-row { grid-template-columns: 34px 1fr 60px; font-size: 12.5px; }
+    .footer-inner { flex-direction: column; gap: 12px; }
   }
 
   @media print {
-    .filters, .reset-btn, .count { display: none !important; }
-    .entry-row { break-inside: avoid; }
+    body::before { display: none; }
+    .index-bar, .reset-btn, .entry-chev, .ribbon, .ribbon-cut { display: none !important; }
+    .entry-row { break-inside: avoid; page-break-inside: avoid; }
+    .detail-panel { display: block !important; }
   }
 </style>
 </head>
 <body>
-<div class="container">
-  <!-- Header -->
-  <header>
-    <h1>手話サークル企画レシピ</h1>
-    <div class="header-desc">
-      <p>どんな企画をしたらいいか分からない。</p>
-      <p>それに応えて各地から企画案を集めてみました。</p>
-      <p>提案したい方は<a href="#">こちら</a>から。</p>
+  <!-- ─── Masthead ─────────────────────────────────────── -->
+  <div class="masthead">
+    <div class="masthead-main">
+      <div class="masthead-row">
+        <h1 class="masthead-title">手話レコ</h1>
+      </div>
     </div>
-    <div class="header-line"></div>
-  </header>
 
-  <!-- Filters -->
-  <nav class="filters" id="filters"></nav>
+    <div class="masthead-sub">
+      <div class="kicker">手話サークル<br>レクリエーション<br>コレクション</div>
+      <div class="lede">
+        どんな企画をしたらいいか分からない。それに応えて、各地のサークル運営から企画案を集めました。目的・流れ・タイムスケジュールまで、そのまま持ち込める形で収録しています。提案は<a class="cta" href="#">こちら</a>から。
+      </div>
+      <div class="volume">
+        <span class="num" id="vol-count">20</span>
+        件を収録
+      </div>
+    </div>
+  </div>
 
-  <!-- Count -->
-  <div class="count" id="count"></div>
+  <!-- ─── Filter bar / Index ───────────────────────────── -->
+  <section class="index-bar" aria-label="絞り込み">
+    <div class="index-bar-inner">
+      <div class="index-bar-label">
+        <div>
+          <span class="ja">絞り込み</span>
+        </div>
+        <div class="count-line">
+          <b id="count-big">20</b> / <span id="count-total">20</span> 件
+        </div>
+      </div>
+      <div class="filters-grid" id="filters"></div>
+    </div>
+  </section>
 
-  <!-- Entries -->
-  <main id="entries"></main>
+  <!-- ─── Directory ────────────────────────────────────── -->
+  <div class="wrap">
+    <div class="directory-head">
+      <span class="section-title">企画一覧</span>
+      <span class="section-no" id="sort-label">全20件</span>
+    </div>
+    <main id="entries"></main>
+  </div>
 
-  <!-- Footer -->
+  <!-- ─── Footer ───────────────────────────────────────── -->
   <footer>
-    <p>手話サークル企画レシピ</p>
+    <div class="footer-inner">
+      <span class="mark">手話レコ</span>
+    </div>
   </footer>
-</div>
 
 <script>
 // ─── Data ───────────────────────────────────────────────
@@ -212,7 +695,8 @@ const PEOPLES = ["〜5人","6〜15人","16人〜","人数不問"];
 const DIFFS = ["やさしい","ふつう","しっかり"];
 const PREPS = ["不要","必要"];
 const DIFF_COLORS = {"やさしい":"#7A9B7E","ふつう":"#C4944A","しっかり":"#B8533E"};
-
+</script>
+<script>
 // ─── State ──────────────────────────────────────────────
 let filters = { major:null, minor:null, time:null, people:null, diff:null, prep:null };
 let openId = null;
@@ -274,39 +758,64 @@ function getFiltered() {
   });
 }
 
+// roman numerals for nums
+function toRoman(n) {
+  const map = [[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+  let out = '';
+  for (const [v,s] of map) { while (n>=v) { out+=s; n-=v; } }
+  return out;
+}
+
 function renderEntries() {
   const filtered = getFiltered();
-  document.getElementById('count').textContent = filtered.length + ' 件';
+  const countBig = document.getElementById('count-big');
+  if (countBig) countBig.textContent = filtered.length;
+  document.getElementById('sort-label').textContent =
+    filtered.length === 0 ? '' : `全${filtered.length}件`;
+
   const main = document.getElementById('entries');
   if (filtered.length === 0) {
-    main.innerHTML = '<p class="empty">条件に合う企画がありません。絞り込みを変えてみてください。</p>';
+    main.innerHTML = '<p class="empty">条件に合う企画はありません</p>';
     return;
   }
   main.innerHTML = filtered.map((a, i) => {
     const isOpen = openId === a.id;
     const ribbonColor = DIFF_COLORS[a.diff];
+    const num = String(i+1).padStart(2, '0');
     return `
-    <article class="entry" style="animation-delay:${i*0.04}s">
-      <div class="entry-row" onclick="toggleEntry(${a.id})">
+    <article class="entry" style="animation-delay:${i*0.03}s">
+      <div class="entry-row ${isOpen?'is-open':''}" onclick="toggleEntry(${a.id})">
         <div class="ribbon" style="background:${ribbonColor}"><span>${a.diff}</span></div>
         <div class="ribbon-cut" style="border-top-color:${ribbonColor}"></div>
-        <div class="entry-title-row">
-          <h2 class="entry-title${isOpen?' open':''}">${a.title}</h2>
-          <div class="entry-meta">
-            <span>${a.major}</span><span class="sep">/</span><span>${a.minor}</span>
-            <span class="sep">|</span><span>${a.time}</span><span>${a.people}</span>
-            ${a.prep==='必要'?'<span class="prep-tag">準備要</span>':''}
+        <div class="entry-num">No.<span class="big">${num}</span></div>
+        <div class="entry-body">
+          <div class="entry-title-row">
+            <h2 class="entry-title">${a.title}</h2>
+            <div class="entry-meta">
+              <span class="ja">${a.major}</span><span class="sep">·</span><span class="ja">${a.minor}</span>
+              <span class="sep">/</span>
+              <span class="ja">${a.time}</span>
+              <span class="sep">·</span>
+              <span class="ja">${a.people}</span>
+              ${a.prep==='必要'?'<span class="prep-tag">準備要</span>':''}
+            </div>
+          </div>
+          <p class="entry-catch">${a.catch}</p>
+        </div>
+        <span class="entry-chev">→</span>
+      </div>
+      <div class="detail-panel ${isOpen?'open':''}">
+        <div class="detail-inner">
+          <div class="detail-rail">${toRoman(i+1)}</div>
+          <div class="detail-main">
+            ${detailBlock('目的', a.purpose)}
+            ${detailBlock('企画設計', a.design)}
+            ${flowBlock(a.flow)}
+            ${scheduleBlock(a.schedule)}
+            ${detailBlock('コツ・アレンジ', a.tips)}
+            ${detailBlock('準備するもの', a.materials)}
           </div>
         </div>
-        <p class="entry-catch">${a.catch}</p>
-      </div>
-      <div class="detail-panel${isOpen?' open':''}">
-        ${detailBlock('目的', a.purpose)}
-        ${detailBlock('企画設計', a.design)}
-        ${flowBlock(a.flow)}
-        ${scheduleBlock(a.schedule)}
-        ${detailBlock('コツ・アレンジ', a.tips)}
-        ${detailBlock('準備するもの', a.materials)}
       </div>
     </article>`;
   }).join('');
@@ -315,24 +824,29 @@ function renderEntries() {
 function detailBlock(label, content) {
   let body;
   if (Array.isArray(content)) {
-    body = '<ul>' + content.map(c => `<li>${c}</li>`).join('') + '</ul>';
+    body = '<ul>' + content.map(c => `<li>${escapeHtml(c)}</li>`).join('') + '</ul>';
   } else {
-    body = `<p>${content}</p>`;
+    body = `<p>${escapeHtml(content).replace(/\n/g,'<br>')}</p>`;
   }
-  return `<div class="detail-text"><p class="detail-label">${label}</p>${body}</div>`;
+  return `<div class="detail-block"><div class="detail-label">${label}</div><div class="detail-text">${body}</div></div>`;
 }
 
 function flowBlock(steps) {
-  const items = steps.map(s => `<li>${s}</li>`).join('');
-  return `<div class="detail-text"><p class="detail-label">流れ</p><ol>${items}</ol></div>`;
+  const items = steps.map(s => `<li>${escapeHtml(s)}</li>`).join('');
+  return `<div class="detail-block"><div class="detail-label">流れ</div><div class="detail-text"><ol>${items}</ol></div></div>`;
 }
 
 function scheduleBlock(sched) {
   if (!sched) return '';
   const rows = sched.steps.map((s, i) =>
-    `<div class="schedule-step"><span class="schedule-num">${i+1}.</span><span>${s.label}</span><span class="schedule-time">(${s.min})</span></div>`
+    `<div class="schedule-row"><span class="schedule-num">${String(i+1).padStart(2,'0')}</span><span>${escapeHtml(s.label)}</span><span class="schedule-time">${escapeHtml(s.min)}</span></div>`
   ).join('');
-  return `<div class="detail-text"><p class="detail-label">タイムスケジュール例（${sched.total}）</p>${rows}</div>`;
+  return `<div class="detail-block"><div class="detail-label">タイムスケジュール例<span class="schedule-total">合計 <b>${escapeHtml(sched.total)}</b></span></div><div class="detail-text"><div class="schedule-table">${rows}</div></div></div>`;
+}
+
+function escapeHtml(s){
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 function toggleEntry(id) {
@@ -341,6 +855,8 @@ function toggleEntry(id) {
 }
 
 // ─── Init ───────────────────────────────────────────────
+document.getElementById('vol-count').textContent = String(ACTIVITIES.length);
+document.getElementById('count-total').textContent = String(ACTIVITIES.length);
 render();
 </script>
 </body>
