@@ -650,6 +650,49 @@
     .modal-detail { padding: 18px 16px 20px; }
   }
 
+  /* ─── シェアバー ─── */
+  .share-bar {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--ink-4);
+    display: flex; flex-wrap: wrap; gap: 10px;
+    align-items: center;
+  }
+  .share-bar .label {
+    font-family: 'RocknRoll One', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--ink-3);
+    margin-right: 4px;
+  }
+  .share-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px 8px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 0 var(--ink);
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-weight: 700;
+    font-size: 12.5px;
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+  }
+  .share-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 0 var(--ink);
+  }
+  .share-btn.x      { background: var(--ink); color: var(--cream); }
+  .share-btn.line   { background: #06C755; color: #fff; }
+  .share-btn.copy   { background: var(--yellow); }
+  .share-btn.copy.copied { background: var(--green); color: #fff; }
+  .share-btn .icon { font-size: 14px; line-height: 1; }
+  @media (max-width: 540px) {
+    .share-bar { gap: 8px; }
+    .share-btn { padding: 6px 11px 7px; font-size: 12px; }
+  }
+
   .detail-block { margin-bottom: 20px; }
   .detail-block:last-child { margin-bottom: 0; }
   .detail-label {
@@ -1007,7 +1050,43 @@ function renderModal(a){
         ${detailBlock('コツ・アレンジ', a.tips)}
         ${detailBlock('準備するもの', a.materials)}
       </div>
+      ${shareBar(a)}
     </div>`;
+}
+
+function shareBar(a){
+  const url = location.origin + location.pathname + '#' + a.id;
+  const text = `「${a.title}」 — ${a.catch}`;
+  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+  const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+  return `
+    <div class="share-bar">
+      <span class="label">SHARE</span>
+      <button class="share-btn copy" onclick="copyShareUrl(this, ${a.id}); event.stopPropagation();" type="button">
+        <span class="icon">🔗</span>URLコピー
+      </button>
+      <a class="share-btn x" href="${xUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();">
+        <span class="icon">𝕏</span>でシェア
+      </a>
+      <a class="share-btn line" href="${lineUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();">
+        <span class="icon">💬</span>LINEで送る
+      </a>
+    </div>`;
+}
+
+function copyShareUrl(btn, id){
+  const url = location.origin + location.pathname + '#' + id;
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML = '<span class="icon">✓</span>コピー済み';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = orig;
+    }, 1500);
+  }).catch(() => {
+    alert('コピーに失敗しました: ' + url);
+  });
 }
 
 function detailBlock(label, content){
@@ -1031,13 +1110,19 @@ function escapeHtml(s){
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function openModal(id){
+function openModal(id, opts){
   const a = ACTIVITIES.find(x => x.id === id);
   if (!a) return;
   const modal = document.getElementById('modal');
   document.getElementById('modal-card').innerHTML = renderModal(a);
   modal.classList.add('is-open');
   document.body.classList.add('modal-locked');
+  // URLハッシュを同期（hashchange イベントの再帰呼び出しは syncFromHash 側でガード）
+  if (!opts || !opts.skipHash) {
+    if (location.hash !== '#' + id) {
+      history.pushState(null, '', '#' + id);
+    }
+  }
 }
 function closeModal(event){
   // overlay クリックで閉じる時は target===overlay の時のみ
@@ -1046,15 +1131,40 @@ function closeModal(event){
   }
   document.getElementById('modal').classList.remove('is-open');
   document.body.classList.remove('modal-locked');
+  // URLハッシュをクリア（履歴は汚さず replace で）
+  if (location.hash) {
+    history.replaceState(null, '', location.pathname + location.search);
+  }
 }
 // Esc で閉じる
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
 });
 
+// ハッシュ→モーダル同期（ページロード時 + 戻る/進む時）
+function syncFromHash(){
+  const m = location.hash.match(/^#(\d+)$/);
+  if (m) {
+    const id = parseInt(m[1], 10);
+    if (ACTIVITIES.find(x => x.id === id)) {
+      openModal(id, { skipHash: true });
+      return;
+    }
+  }
+  // ハッシュ無効 or 無し → モーダル閉じる
+  const modal = document.getElementById('modal');
+  if (modal.classList.contains('is-open')) {
+    modal.classList.remove('is-open');
+    document.body.classList.remove('modal-locked');
+  }
+}
+window.addEventListener('hashchange', syncFromHash);
+
 document.getElementById('vol-count').textContent = String(ACTIVITIES.length);
 document.getElementById('count-total').textContent = String(ACTIVITIES.length);
 render();
+// 初期ロード時にハッシュチェック
+syncFromHash();
 </script>
 </body>
 </html>
