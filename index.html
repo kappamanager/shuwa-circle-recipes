@@ -802,6 +802,44 @@
   }
   .card.is-open .card-flag { background: var(--red); color: var(--cream); }
 
+  /* ─── トップへ戻るボタン ─── */
+  .to-top {
+    position: fixed;
+    right: 20px; bottom: 20px;
+    width: 56px; height: 56px;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    box-shadow: 4px 4px 0 0 var(--ink);
+    cursor: pointer;
+    z-index: 50;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 1px;
+    font-family: 'RocknRoll One', sans-serif;
+    color: var(--ink);
+    line-height: 1;
+    opacity: 0;
+    transform: translateY(8px) rotate(-3deg);
+    pointer-events: none;
+    transition: opacity .25s, transform .25s, box-shadow .15s;
+  }
+  .to-top.visible {
+    opacity: 1;
+    transform: translateY(0) rotate(-3deg);
+    pointer-events: auto;
+  }
+  .to-top:hover {
+    transform: translate(-2px, -3px) rotate(0);
+    box-shadow: 6px 7px 0 0 var(--ink);
+  }
+  .to-top .arrow { font-size: 20px; font-weight: 700; }
+  .to-top .label { font-size: 9px; letter-spacing: 0.15em; margin-top: 2px; }
+  @media (max-width: 540px) {
+    .to-top { width: 48px; height: 48px; right: 14px; bottom: 14px; }
+    .to-top .arrow { font-size: 17px; }
+    .to-top .label { font-size: 8px; }
+  }
+
   /* ─── 空 ─── */
   .empty {
     grid-column: 1 / -1;
@@ -900,7 +938,7 @@
     <div class="boxlid-lede">
       どんな企画をしたらいいか分からない。そんなときの、おもちゃ箱。
       各地のサークル運営から集めた企画案を、目的・流れ・タイムスケジュールまで、そのまま持ち込める形で詰め込みました。
-      提案は<a class="cta" href="#">こちら</a>から。
+      提案は<a class="cta" href="https://docs.google.com/forms/d/e/1FAIpQLScO5LDSMv9QNAYFmnZn2FUrOdTDWVtPCQvG454D6AP0Nq2-7g/viewform" target="_blank" rel="noopener">こちら</a>から。
     </div>
   </header>
 
@@ -928,6 +966,12 @@
   <div class="modal-overlay" id="modal" onclick="closeModal(event)">
     <div class="modal-card" id="modal-card" onclick="event.stopPropagation()"></div>
   </div>
+
+  <!-- ─── トップへ戻る ─── -->
+  <button class="to-top" id="to-top" onclick="scrollToTop()" aria-label="トップへ戻る" type="button">
+    <span class="arrow">▲</span>
+    <span class="label">TOP</span>
+  </button>
 
   <footer>
     <span class="logo">手話<span class="dot">・</span>レコ</span>
@@ -1159,6 +1203,16 @@ function syncFromHash(){
   }
 }
 window.addEventListener('hashchange', syncFromHash);
+
+// トップへ戻るボタン
+function scrollToTop(){
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('to-top');
+  if (window.scrollY > 400) btn.classList.add('visible');
+  else btn.classList.remove('visible');
+}, { passive: true });
 
 document.getElementById('vol-count').textContent = String(ACTIVITIES.length);
 document.getElementById('count-total').textContent = String(ACTIVITIES.length);
