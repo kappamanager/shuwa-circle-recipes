@@ -289,6 +289,17 @@
     letter-spacing: 0;
   }
   .drawer-head .count .slash { color: var(--ink-4); }
+  .drawer-head .hint {
+    font-family: 'M PLUS 1 Code', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    background: var(--yellow);
+    border: 1.5px solid var(--ink);
+    padding: 2px 8px 3px;
+    box-shadow: 2px 2px 0 0 var(--ink);
+    transform: rotate(2deg);
+  }
 
   .filters-grid { display: grid; grid-template-columns: 100px 1fr; gap: 10px 16px; align-items: start; }
   .filter-label {
@@ -870,8 +881,20 @@
     font-weight: 700;
     font-size: 28px;
     letter-spacing: 0.08em;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
   }
-  footer .logo .dot { color: var(--red); }
+  footer .logo img {
+    width: 44px; height: 44px;
+    display: block;
+    border: 2px solid var(--cream);
+    background: var(--cream);
+    box-shadow: 3px 3px 0 0 var(--red);
+  }
+  @media (max-width: 540px) {
+    footer .logo img { width: 36px; height: 36px; }
+  }
   footer .mini {
     font-family: 'M PLUS 1 Code', monospace;
     font-size: 11px;
@@ -887,7 +910,13 @@
     .boxlid-main { grid-template-columns: 1fr; gap: 14px; }
     .boxlid-sub-wrap { text-align: left; }
     .boxlid-title { font-size: clamp(44px, 14vw, 80px); text-shadow: 3px 3px 0 var(--ink); white-space: nowrap; }
-    .boxlid-lede { font-size: 14px; padding: 16px 16px 18px; }
+    .boxlid-lede { font-size: 14px; padding: 28px 16px 18px; }
+    .boxlid-lede::before {
+      width: 30px; height: 30px;
+      font-size: 32px;
+      top: -12px; left: 12px;
+      padding-top: 2px;
+    }
 
     .drawer { padding: 20px 16px 18px; box-shadow: 4px 4px 0 0 var(--ink); }
     .drawer-head .label { font-size: 18px; padding: 3px 12px; }
@@ -937,7 +966,7 @@
     </div>
     <div class="boxlid-lede">
       どんな企画をしたらいいか分からない。そんなときの、おもちゃ箱。
-      各地のサークル運営から集めた企画案を、目的・流れ・タイムスケジュールまで、そのまま持ち込める形で詰め込みました。
+      各地から集めた企画案を、目的・流れ・タイムスケジュールまで、使える詰め込みました。
       提案は<a class="cta" href="https://docs.google.com/forms/d/e/1FAIpQLScO5LDSMv9QNAYFmnZn2FUrOdTDWVtPCQvG454D6AP0Nq2-7g/viewform" target="_blank" rel="noopener">こちら</a>から。
     </div>
   </header>
@@ -947,6 +976,7 @@
     <div class="drawer-head">
       <span class="label">▼ 開けゴマ！</span>
       <span class="count"><span class="slash">表示中</span><b id="count-big">20</b>/<span id="count-total">20</span>件</span>
+      <span class="hint">複数選択OK</span>
     </div>
     <div class="filters-grid" id="filters"></div>
   </section>
@@ -974,14 +1004,15 @@
   </button>
 
   <footer>
-    <span class="logo">手話<span class="dot">・</span>レコ</span>
+    <span class="logo"><img src="images/ico.png" alt="手話レコ アイコン">手話レコ</span>
   </footer>
 </div>
 
 <script src="data.js"></script>
 <script>
 // ─── State ─────────
-let filters = { major:null, minor:null, time:null, people:null, diff:null, prep:null };
+// 各 key は配列。空配列 = 未選択（その軸で絞り込みなし）。複数値 = OR 条件
+let filters = { major:[], minor:[], time:[], people:[], diff:[], prep:[] };
 
 const MAJOR_COLOR_CLASS = { "交流系":"color-blue", "学習系":"color-green" };
 const DIFF_COLOR_CLASS  = { "やさしい":"color-green", "ふつう":"color-yellow", "しっかり":"color-red" };
@@ -992,14 +1023,17 @@ function renderFilters(){
   const nav = document.getElementById('filters');
   let html = '';
   html += filterRow('分類',   ['交流系','学習系'].map(v => chip(v,'major', MAJOR_COLOR_CLASS[v])).join(''));
-  if (filters.major) {
-    html += filterRow('種別',  MINORS[filters.major].map(v => chip(v,'minor')).join(''));
+  if (filters.major.length > 0) {
+    // 選択中の major たちの minor を統合（重複排除）
+    const minorSet = new Set();
+    filters.major.forEach(m => (MINORS[m] || []).forEach(x => minorSet.add(x)));
+    html += filterRow('種別',  Array.from(minorSet).map(v => chip(v,'minor')).join(''));
   }
   html += filterRow('時間',   TIMES.map(v => chip(v,'time')).join(''));
   html += filterRow('人数',   PEOPLES.map(v => chip(v,'people')).join(''));
   html += filterRow('難易度', DIFFS.map(v => chip(v,'diff', DIFF_COLOR_CLASS[v])).join(''));
   html += filterRow('準備',   PREPS.map(v => chip(v,'prep', v==='必要'?'color-red':'')).join(''));
-  const hasFilter = Object.values(filters).some(v => v !== null);
+  const hasFilter = Object.values(filters).some(arr => arr.length > 0);
   html += `<div></div><div><button class="reset-btn ${hasFilter?'visible':''}" onclick="clearFilters()">絞り込みをリセット</button></div>`;
   nav.innerHTML = html;
 }
@@ -1007,26 +1041,39 @@ function filterRow(label, btns){
   return `<div class="filter-label">${label}</div><div class="filter-group">${btns}</div>`;
 }
 function chip(value, key, extraClass=''){
-  const active = filters[key] === value ? ' active' : '';
+  const active = filters[key].includes(value) ? ' active' : '';
   return `<button class="chip ${extraClass}${active}" onclick="toggleFilter('${key}','${value}')">${value}</button>`;
 }
 function toggleFilter(key, value){
-  filters[key] = filters[key] === value ? null : value;
-  if (key==='major') filters.minor = null;
+  const arr = filters[key];
+  const idx = arr.indexOf(value);
+  if (idx >= 0) arr.splice(idx, 1);
+  else arr.push(value);
+  // major 変更時、現在の major セットで無効になった minor は削除（賢く連動）
+  if (key === 'major') {
+    if (filters.major.length === 0) {
+      filters.minor = [];
+    } else {
+      const validMinors = new Set();
+      filters.major.forEach(m => (MINORS[m] || []).forEach(x => validMinors.add(x)));
+      filters.minor = filters.minor.filter(m => validMinors.has(m));
+    }
+  }
   render();
 }
 function clearFilters(){
-  filters = { major:null, minor:null, time:null, people:null, diff:null, prep:null };
+  filters = { major:[], minor:[], time:[], people:[], diff:[], prep:[] };
   render();
 }
 function getFiltered(){
   return ACTIVITIES.filter(a => {
-    if (filters.major && a.major !== filters.major) return false;
-    if (filters.minor && a.minor !== filters.minor) return false;
-    if (filters.time && a.time !== filters.time) return false;
-    if (filters.people && a.people !== filters.people) return false;
-    if (filters.diff && a.diff !== filters.diff) return false;
-    if (filters.prep && a.prep !== filters.prep) return false;
+    // 各軸: 配列が空 = フィルタなし、空でない = 値が含まれる必要あり（OR条件）
+    if (filters.major.length > 0 && !filters.major.includes(a.major)) return false;
+    if (filters.minor.length > 0 && !filters.minor.includes(a.minor)) return false;
+    if (filters.time.length > 0 && !filters.time.includes(a.time)) return false;
+    if (filters.people.length > 0 && !filters.people.includes(a.people)) return false;
+    if (filters.diff.length > 0 && !filters.diff.includes(a.diff)) return false;
+    if (filters.prep.length > 0 && !filters.prep.includes(a.prep)) return false;
     return true;
   });
 }
