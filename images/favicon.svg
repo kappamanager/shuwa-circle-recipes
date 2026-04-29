@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  
+  <rect width="64" height="64" rx="10" fill="#F6EED6"></rect>
+  
+  <rect x="6" y="6" width="52" height="52" rx="6" fill="#D94A3D" stroke="#1F1A17" stroke-width="3"></rect>
+  
+  <rect x="10" y="10" width="44" height="44" rx="3" fill="none" stroke="#F6EED6" stroke-width="2"></rect>
+  
+  <g transform="translate(46 16) rotate(-10)">
+    <polygon points="0,-7 2,-2 7,-2 3,1.5 5,7 0,4 -5,7 -3,1.5 -7,-2 -2,-2" fill="#E8B52A" stroke="#1F1A17" stroke-width="1.5" stroke-linejoin="round"></polygon>
+  </g>
+  
+  <text x="28" y="46" font-family="&#39;Kaisei Decol&#39;, &#39;Yu Mincho&#39;, &#39;Hiragino Mincho ProN&#39;, serif" font-size="32" font-weight="700" fill="#F6EED6" text-anchor="middle" stroke="#1F1A17" stroke-width="1.2" paint-order="stroke fill">手</text>
+</svg>
