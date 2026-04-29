@@ -4,6 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>手話レコ — 手話サークルレクリエーションコレクション</title>
+
+<!-- ─── SEO ─── -->
+<meta name="description" content="手話サークル運営者のための企画ネタ集。各地から集めた手話×レクリエーション企画案を、目的・流れ・タイムスケジュール・準備物まで具体的に紹介。例会・合宿・SSP・新歓など、シーンに合わせて選べる企画レシピのおもちゃ箱。">
+<meta name="keywords" content="手話, 手話サークル, レクリエーション, アイスブレイク, 企画, 例会, ろう者, 聴覚障害, 手話学習, ジェスチャーゲーム">
+<link rel="canonical" href="https://shuwa-circle-recipes.vercel.app/">
+
+<!-- ─── Favicon ─── -->
+<link rel="icon" type="image/png" href="images/ico.png">
+<link rel="apple-touch-icon" href="images/ico.png">
+
+<!-- ─── OGP (SNSシェア時のカード表示) ─── -->
+<meta property="og:title" content="手話レコ — 手話サークルレクリエーションコレクション">
+<meta property="og:description" content="手話サークルの企画ネタ集。各地から集めた手話×レクリエーション企画を、目的・流れ・タイムスケジュールまで詳しく紹介。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://shuwa-circle-recipes.vercel.app/">
+<meta property="og:image" content="https://shuwa-circle-recipes.vercel.app/images/ico.png">
+<meta property="og:site_name" content="手話レコ">
+<meta property="og:locale" content="ja_JP">
+
+<!-- ─── Twitter Card ─── -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="手話レコ — 手話サークルレクリエーションコレクション">
+<meta name="twitter:description" content="手話サークルの企画ネタ集。各地から集めた手話×レクリエーション企画を詳しく紹介。">
+<meta name="twitter:image" content="https://shuwa-circle-recipes.vercel.app/images/ico.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=RocknRoll+One&family=Kaisei+Decol:wght@500;700&family=M+PLUS+1+Code:wght@500;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1145,8 +1170,11 @@ function renderModal(a){
     </div>`;
 }
 
+// シェア用の固定ベースURL（どのドメインで開いていても Vercel のURLでシェアされる）
+const SHARE_BASE = 'https://shuwa-circle-recipes.vercel.app/';
+
 function shareBar(a){
-  const url = location.origin + location.pathname + '#' + a.id;
+  const url = SHARE_BASE + '#' + a.id;
   const text = `「${a.title}」 — ${a.catch}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
   const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
@@ -1166,7 +1194,7 @@ function shareBar(a){
 }
 
 function copyShareUrl(btn, id){
-  const url = location.origin + location.pathname + '#' + id;
+  const url = SHARE_BASE + '#' + id;
   navigator.clipboard.writeText(url).then(() => {
     const orig = btn.innerHTML;
     btn.classList.add('copied');
