@@ -1043,6 +1043,58 @@
 // 各 key は配列。空配列 = 未選択（その軸で絞り込みなし）。複数値 = OR 条件
 let filters = { major:[], minor:[], time:[], people:[], diff:[], prep:[] };
 
+const FILTER_KEYS = ['major','minor','time','people','diff','prep'];
+
+// Excel由来の企画データに実在する値だけを、シート上の初出順で選択肢にする。
+// 新しい値を追加しても、data.jsを再生成すればフィルターへ自動反映される。
+function uniqueActivityValues(key){
+  const seen = new Set();
+  const values = [];
+  ACTIVITIES.forEach(activity => {
+    activityValues(activity, key).forEach(value => {
+      if (!seen.has(value)) {
+        seen.add(value);
+        values.push(value);
+      }
+    });
+  });
+  return values;
+}
+
+function activityValues(activity, key){
+  const raw = activity[key];
+  const values = Array.isArray(raw) ? raw : [raw];
+  return values
+    .filter(value => typeof value === 'string')
+    .map(value => value.trim())
+    .filter(Boolean);
+}
+
+const FILTER_VALUES = Object.fromEntries(
+  FILTER_KEYS.map(key => [key, uniqueActivityValues(key)])
+);
+
+// 時間だけは企画の並び順ではなく、短い区分から順に表示する。
+function timeOrder(value){
+  const range = value.match(/^(\d+)[〜～](\d+)分$/);
+  if (range) return Number(range[2]);
+  const within = value.match(/^(\d+)分以内$/);
+  if (within) return Number(within[1]);
+  const over = value.match(/^(\d+)分超$/);
+  if (over) return Number(over[1]) + 0.5;
+  return Number.POSITIVE_INFINITY;
+}
+FILTER_VALUES.time.sort((a, b) => timeOrder(a) - timeOrder(b));
+
+const MINORS_BY_MAJOR = {};
+ACTIVITIES.forEach(activity => {
+  const major = typeof activity.major === 'string' ? activity.major.trim() : '';
+  const minor = typeof activity.minor === 'string' ? activity.minor.trim() : '';
+  if (!major || !minor) return;
+  if (!MINORS_BY_MAJOR[major]) MINORS_BY_MAJOR[major] = [];
+  if (!MINORS_BY_MAJOR[major].includes(minor)) MINORS_BY_MAJOR[major].push(minor);
+});
+
 const MAJOR_COLOR_CLASS = { "交流系":"color-blue", "学習系":"color-green" };
 const DIFF_COLOR_CLASS  = { "やさしい":"color-green", "ふつう":"color-yellow", "しっかり":"color-red" };
 
@@ -1051,17 +1103,17 @@ function render(){ renderFilters(); renderEntries(); }
 function renderFilters(){
   const nav = document.getElementById('filters');
   let html = '';
-  html += filterRow('分類',   ['交流系','学習系'].map(v => chip(v,'major', MAJOR_COLOR_CLASS[v])).join(''));
+  html += filterRow('分類',   FILTER_VALUES.major.map(v => chip(v,'major', MAJOR_COLOR_CLASS[v])).join(''));
   if (filters.major.length > 0) {
     // 選択中の major たちの minor を統合（重複排除）
     const minorSet = new Set();
-    filters.major.forEach(m => (MINORS[m] || []).forEach(x => minorSet.add(x)));
+    filters.major.forEach(m => (MINORS_BY_MAJOR[m] || []).forEach(x => minorSet.add(x)));
     html += filterRow('種別',  Array.from(minorSet).map(v => chip(v,'minor')).join(''));
   }
-  html += filterRow('時間',   TIMES.map(v => chip(v,'time')).join(''));
-  html += filterRow('人数',   PEOPLES.map(v => chip(v,'people')).join(''));
-  html += filterRow('難易度', DIFFS.map(v => chip(v,'diff', DIFF_COLOR_CLASS[v])).join(''));
-  html += filterRow('準備',   PREPS.map(v => chip(v,'prep', v==='必要'?'color-red':'')).join(''));
+  html += filterRow('時間',   FILTER_VALUES.time.map(v => chip(v,'time')).join(''));
+  html += filterRow('人数',   FILTER_VALUES.people.map(v => chip(v,'people')).join(''));
+  html += filterRow('難易度', FILTER_VALUES.diff.map(v => chip(v,'diff', DIFF_COLOR_CLASS[v])).join(''));
+  html += filterRow('準備',   FILTER_VALUES.prep.map(v => chip(v,'prep', v==='必要'?'color-red':'')).join(''));
   const hasFilter = Object.values(filters).some(arr => arr.length > 0);
   html += `<div></div><div><button class="reset-btn ${hasFilter?'visible':''}" onclick="clearFilters()">絞り込みをリセット</button></div>`;
   nav.innerHTML = html;
@@ -1071,7 +1123,7 @@ function filterRow(label, btns){
 }
 function chip(value, key, extraClass=''){
   const active = filters[key].includes(value) ? ' active' : '';
-  return `<button class="chip ${extraClass}${active}" onclick="toggleFilter('${key}','${value}')">${value}</button>`;
+  return `<button type="button" class="chip ${extraClass || ''}${active}" data-filter-key="${escapeHtml(key)}" data-filter-value="${escapeHtml(value)}" aria-pressed="${active ? 'true' : 'false'}" onclick="toggleFilter(this.dataset.filterKey,this.dataset.filterValue)">${escapeHtml(value)}</button>`;
 }
 function toggleFilter(key, value){
   const arr = filters[key];
@@ -1084,7 +1136,7 @@ function toggleFilter(key, value){
       filters.minor = [];
     } else {
       const validMinors = new Set();
-      filters.major.forEach(m => (MINORS[m] || []).forEach(x => validMinors.add(x)));
+      filters.major.forEach(m => (MINORS_BY_MAJOR[m] || []).forEach(x => validMinors.add(x)));
       filters.minor = filters.minor.filter(m => validMinors.has(m));
     }
   }
@@ -1100,11 +1152,18 @@ function getFiltered(){
     if (filters.major.length > 0 && !filters.major.includes(a.major)) return false;
     if (filters.minor.length > 0 && !filters.minor.includes(a.minor)) return false;
     if (filters.time.length > 0 && !filters.time.includes(a.time)) return false;
-    if (filters.people.length > 0 && !filters.people.includes(a.people)) return false;
+    if (filters.people.length > 0 && !filters.people.some(value => activityValues(a, 'people').includes(value))) return false;
     if (filters.diff.length > 0 && !filters.diff.includes(a.diff)) return false;
     if (filters.prep.length > 0 && !filters.prep.includes(a.prep)) return false;
     return true;
   });
+}
+
+function formatPeople(people){
+  const values = activityValues({ people }, 'people');
+  const coversAll = FILTER_VALUES.people.length > 0
+    && FILTER_VALUES.people.every(value => values.includes(value));
+  return coversAll ? '全人数対応' : values.join('・');
 }
 
 function renderEntries(){
@@ -1133,7 +1192,7 @@ function renderEntries(){
         <p class="card-catch">${escapeHtml(a.catch)}</p>
         <div class="card-meta">
           <span class="meta-pill time">⏱ ${escapeHtml(a.time)}</span>
-          <span class="meta-pill">👥 ${escapeHtml(a.people)}</span>
+          <span class="meta-pill">👥 ${escapeHtml(formatPeople(a.people))}</span>
           <span class="meta-pill ${a.prep==='必要'?'prep-need':'prep-none'}">準備${a.prep==='必要'?'要':'不要'}</span>
         </div>
       </div>
@@ -1159,7 +1218,7 @@ function renderModal(a){
       <p class="modal-catch">${escapeHtml(a.catch)}</p>
       <div class="modal-meta">
         <span class="meta-pill time">⏱ ${escapeHtml(a.time)}</span>
-        <span class="meta-pill">👥 ${escapeHtml(a.people)}</span>
+        <span class="meta-pill">👥 ${escapeHtml(formatPeople(a.people))}</span>
         <span class="meta-pill ${a.prep==='必要'?'prep-need':'prep-none'}">準備${a.prep==='必要'?'要':'不要'}</span>
       </div>
       <div class="modal-detail">
