@@ -1,12 +1,12 @@
 """
-activities.xlsx を読んで index.html の ACTIVITIES 配列を書き換える。
+activities.xlsx を読んで data.js の ACTIVITIES 配列を書き換える。
 
-xlsx を編集したらこのスクリプトを実行：
-  cd 003_site
+xlsx を編集したらこのスクリプトを実行（data.js と同じフォルダで）：
   python build.py
 
-書き換え対象は index.html の `const ACTIVITIES = [ ... ];` ブロックのみ。
-他の HTML/CSS/JS 部分には触れない。
+書き換え対象は data.js の `const ACTIVITIES = [ ... ];` ブロックのみ。
+フィルター選択肢はサイト表示時に ACTIVITIES から自動生成される。
+HTML/CSS/JS 部分には触れない。
 """
 
 import json
@@ -15,7 +15,7 @@ import re
 from openpyxl import load_workbook
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-HTML_PATH = os.path.join(HERE, "index.html")
+DATA_PATH = os.path.join(HERE, "data.js")
 XLSX_PATH = os.path.join(HERE, "activities.xlsx")
 
 # init_xlsx.py と同じ列順
@@ -189,6 +189,10 @@ def load_activities_from_xlsx():
 
         sched = parse_schedule(st, ss)
 
+        people = cell_to_array_or_string(row_data.get("people"))
+        if isinstance(people, str):
+            people = [people] if people else []
+
         act = {
             "id": rid,
             "title": (row_data.get("title") or "").strip(),
@@ -196,7 +200,7 @@ def load_activities_from_xlsx():
             "major": (row_data.get("major") or "").strip(),
             "minor": (row_data.get("minor") or "").strip(),
             "time": (row_data.get("time") or "").strip(),
-            "people": (row_data.get("people") or "").strip(),
+            "people": people,
             "diff": (row_data.get("diff") or "").strip(),
             "prep": (row_data.get("prep") or "").strip(),
             "purpose": (row_data.get("purpose") or "").strip(),
@@ -220,27 +224,27 @@ def load_activities_from_xlsx():
     return activities
 
 
-def write_activities_to_html(activities):
-    with open(HTML_PATH, "r", encoding="utf-8") as f:
-        html = f.read()
+def write_activities_to_data_js(activities):
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        text = f.read()
 
     # 各 activity を JS リテラルに
     body = ",\n  ".join(activity_to_js_literal(a) for a in activities)
     new_block = f"const ACTIVITIES = [\n  {body},\n];"
 
     # 置換（lambda で渡してバックスラッシュエスケープの再解釈を回避）
-    new_html, n = re.subn(
+    new_text, n = re.subn(
         r"const\s+ACTIVITIES\s*=\s*\[.*?\];",
         lambda _m: new_block,
-        html,
+        text,
         count=1,
         flags=re.DOTALL,
     )
     if n != 1:
-        raise RuntimeError("ACTIVITIES ブロックの置換に失敗")
+        raise RuntimeError("ACTIVITIES ブロックの置換に失敗（data.js 内）")
 
-    with open(HTML_PATH, "w", encoding="utf-8", newline="\n") as f:
-        f.write(new_html)
+    with open(DATA_PATH, "w", encoding="utf-8", newline="\n") as f:
+        f.write(new_text)
 
 
 def main():
@@ -265,14 +269,19 @@ def main():
     print(f"読み込み: {len(activities)} 件")
 
     try:
-        write_activities_to_html(activities)
+        write_activities_to_data_js(activities)
     except PermissionError as e:
         print("--- エラー ---")
-        print("index.html に書き込めません。")
-        print("ブラウザ等でファイルがロックされていないか確認してください。")
+        print("data.js に書き込めません。")
+        print("エディタ等でファイルがロックされていないか確認してください。")
         print(f"詳細: {e}")
         raise SystemExit(1)
-    print(f"書き出し完了: {HTML_PATH}")
+    except FileNotFoundError as e:
+        print("--- エラー ---")
+        print(f"data.js が見つかりません: {DATA_PATH}")
+        print(f"詳細: {e}")
+        raise SystemExit(1)
+    print(f"書き出し完了: {DATA_PATH}")
 
 
 if __name__ == "__main__":

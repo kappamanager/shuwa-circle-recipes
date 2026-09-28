@@ -12,6 +12,6 @@ if errorlevel 1 (
 )
 echo.
 echo ====================================
-echo  BUILD OK. index.html has been updated.
+echo  BUILD OK. data.js has been updated.
 echo ====================================
 timeout /t 3 >nul

@@ -1,6 +1,6 @@
 """
-index.html の ACTIVITIES 配列を読んで activities.xlsx を生成する初期化スクリプト。
-1度だけ実行する。以降は build.py で xlsx → index.html の方向に同期する。
+data.js の ACTIVITIES 配列を読んで activities.xlsx を生成する初期化スクリプト。
+1度だけ実行する。以降は build.py で xlsx → data.js の方向に同期する。
 
 xlsx のフォーマット規則:
   - design / tips: セル内が1行 → string、複数行 → 配列
@@ -8,9 +8,10 @@ xlsx のフォーマット規則:
   - schedule_total: 空 → schedule:null、値あり → schedule object 生成
   - schedule_steps: 空 OK。各行 "5分：ルール説明" or "5分:ルール説明" 形式
 
-使い方:
-  cd 003_site
+使い方（data.js と同じフォルダで実行）:
   python init_xlsx.py
+
+activities.xlsx が既にある場合は、編集中のデータを消さないよう中断する。
 """
 
 import json
@@ -21,7 +22,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-HTML_PATH = os.path.join(HERE, "index.html")
+DATA_PATH = os.path.join(HERE, "data.js")
 XLSX_PATH = os.path.join(HERE, "activities.xlsx")
 
 # 列定義: (列名, 幅, ラップ表示するか)
@@ -45,9 +46,9 @@ COLUMNS = [
 ]
 
 
-def extract_activities_block(html: str) -> str:
-    """index.html から const ACTIVITIES = [ ... ]; のブロック中身を抜き出す"""
-    m = re.search(r"const\s+ACTIVITIES\s*=\s*\[(.*?)\];", html, re.DOTALL)
+def extract_activities_block(text: str) -> str:
+    """data.js から const ACTIVITIES = [ ... ]; のブロック中身を抜き出す"""
+    m = re.search(r"const\s+ACTIVITIES\s*=\s*\[(.*?)\];", text, re.DOTALL)
     if not m:
         raise ValueError("ACTIVITIES 配列が見つからない")
     return m.group(1)
@@ -88,10 +89,16 @@ def schedule_to_cells(schedule):
 
 
 def main():
-    with open(HTML_PATH, "r", encoding="utf-8") as f:
-        html = f.read()
+    if os.path.exists(XLSX_PATH):
+        print("--- 中断 ---")
+        print(f"activities.xlsx が既にあります: {XLSX_PATH}")
+        print("作り直す場合は、既存ファイルを別名に変更してから再実行してください。")
+        raise SystemExit(1)
 
-    block = extract_activities_block(html)
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        text = f.read()
+
+    block = extract_activities_block(text)
     json_text = js_to_json(block)
     activities = json.loads(json_text)
     print(f"パース成功: {len(activities)} 件")
@@ -122,7 +129,7 @@ def main():
             "major": act.get("major", ""),
             "minor": act.get("minor", ""),
             "time": act.get("time", ""),
-            "people": act.get("people", ""),
+            "people": array_or_string_to_cell(act.get("people")),
             "diff": act.get("diff", ""),
             "prep": act.get("prep", ""),
             "purpose": act.get("purpose", ""),
