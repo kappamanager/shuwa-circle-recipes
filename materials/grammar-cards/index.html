@@ -459,6 +459,8 @@ function attachTilt(root) {
 
 // ---------- 図鑑 ----------
 const state = { deck: null, levels: new Set(), q: "" };
+// 裏向きの一覧でめくったカード（拡大表示や絞り込みのあとも表のまま保つ。「裏向きで並べる」を切り替えるとリセット）
+const revealed = new Set();
 const byNo = new Map(CARDS.map(c => [c.no, c]));
 
 function filtered() {
@@ -484,7 +486,7 @@ function renderGrid() {
   const list = filtered();
   $("#count").textContent = `${list.length} 枚`;
   $("#grid").innerHTML = list.length
-    ? list.map(c => `<div class="slot">${store.learned.has(c.no) ? '<span class="learned-badge" aria-label="覚えた">✓</span>' : ""}${cardHTML(c, { flipped: store.faceDown })}</div>`).join("")
+    ? list.map(c => `<div class="slot">${store.learned.has(c.no) ? '<span class="learned-badge" aria-label="覚えた">✓</span>' : ""}${cardHTML(c, { flipped: store.faceDown && !revealed.has(c.no) })}</div>`).join("")
     : `<div class="empty">条件に合うカードがないよ。絞り込みをゆるめてみてね。</div>`;
 }
 
@@ -514,20 +516,22 @@ $("#q").addEventListener("input", e => { state.q = e.target.value; renderGrid();
 $("#facedown").setAttribute("aria-pressed", store.faceDown);
 $("#facedown").addEventListener("click", e => {
   store.faceDown = !store.faceDown; store.save();
+  revealed.clear();
   e.currentTarget.setAttribute("aria-pressed", store.faceDown);
   document.querySelectorAll("#grid .card").forEach(c => c.classList.toggle("flipped", store.faceDown));
 });
 $("#grid").addEventListener("click", e => {
   const card = e.target.closest(".card"); if (!card) return;
   // 裏向きの一覧では、まずその場でめくる。表を向いているカードは拡大表示
-  if (card.classList.contains("flipped")) { card.classList.remove("flipped"); return; }
+  if (card.classList.contains("flipped")) { card.classList.remove("flipped"); revealed.add(+card.dataset.no); return; }
   const list = filtered();
   openModal(list, list.findIndex(c => c.no === +card.dataset.no), false);
 });
 attachTilt($("#grid"));
 
 // ---------- 拡大表示 ----------
-const modal = { list: [], i: 0, lastFocus: null };
+// draw: 「ひく」で開いたとき true。左右の矢印・スワイプで別のカードをランダムに引き直す
+const modal = { list: [], i: 0, lastFocus: null, draw: false };
 function showModalCard(flipped, anim) {
   const c = modal.list[modal.i];
   $("#stage-card").innerHTML = cardHTML(c, { flipped, tag: "div" });
@@ -535,13 +539,14 @@ function showModalCard(flipped, anim) {
   if (anim) card.classList.add(anim);
   $("#m-pos").textContent = modal.list.length > 1 ? `${modal.i + 1} / ${modal.list.length}` : `No.${String(c.no).padStart(2, "0")}`;
   $("#m-learn").setAttribute("aria-pressed", store.learned.has(c.no));
-  $("#prev").disabled = modal.i === 0;
-  $("#next").disabled = modal.i === modal.list.length - 1;
+  $("#prev").disabled = modal.draw ? filtered().length < 2 : modal.i === 0;
+  $("#next").disabled = modal.draw ? filtered().length < 2 : modal.i === modal.list.length - 1;
 }
-function openModal(list, i, faceDown, anim) {
-  modal.list = list; modal.i = Math.max(0, i);
+function openModal(list, i, faceDown, anim, draw = false) {
+  modal.list = list; modal.i = Math.max(0, i); modal.draw = draw;
   modal.lastFocus = document.activeElement;
-  $("#modal-hint").textContent = faceDown ? "タップしてめくろう" : "タップでめくる ・ ← → で移動";
+  $("#modal-hint").textContent = draw ? "タップしてめくろう ・ ← → で別のカードをひく"
+    : faceDown ? "タップしてめくろう" : "タップでめくる ・ ← → で移動";
   showModalCard(faceDown, anim);
   $("#modal").hidden = false;
   $("#m-flip").focus({ preventScroll: true });
@@ -553,6 +558,12 @@ function closeModal() {
 }
 function flipModal() { $("#stage-card .card")?.classList.toggle("flipped"); }
 function step(d) {
+  if (modal.draw) {
+    const pick = drawCard(modal.list[modal.i]?.no);
+    if (!pick) return;
+    modal.list = [pick]; modal.i = 0; showModalCard(true, "deal");
+    return;
+  }
   const j = modal.i + d;
   if (j < 0 || j >= modal.list.length) return;
   modal.i = j; showModalCard(false);
@@ -590,14 +601,18 @@ document.addEventListener("keydown", e => {
   else if (e.key === " " && e.target.tagName !== "BUTTON") { e.preventDefault(); flipModal(); }
 });
 
-// ひく: 絞り込み中のカードから、まだ覚えていないものを優先して1枚引く
-$("#draw").addEventListener("click", () => {
-  const list = filtered();
-  if (!list.length) return;
+// ひく: 絞り込み中のカードから、まだ覚えていないものを優先して1枚引く（exclude: 直前のカードは避ける）
+function drawCard(exclude) {
+  const list = filtered().filter(c => c.no !== exclude);
+  if (!list.length) return null;
   const fresh = list.filter(c => !store.learned.has(c.no));
   const pool = fresh.length ? fresh : list;
-  const pick = pool[Math.floor(Math.random() * pool.length)];
-  openModal([pick], 0, true, "deal");
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+$("#draw").addEventListener("click", () => {
+  const pick = drawCard();
+  if (!pick) return;
+  openModal([pick], 0, true, "deal", true);
 });
 
 // ---------- クイズ ----------
