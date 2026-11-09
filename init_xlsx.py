@@ -7,6 +7,7 @@ xlsx のフォーマット規則:
   - flow:           常に配列。1行 = 1ステップ
   - schedule_total: 空 → schedule:null、値あり → schedule object 生成
   - schedule_steps: 空 OK。各行 "5分：ルール説明" or "5分:ルール説明" 形式
+  - links:          空 OK。各行 "ラベル | URL" 形式（関連資料ボタンになる）
 
 使い方（data.js と同じフォルダで実行）:
   python init_xlsx.py
@@ -43,6 +44,7 @@ COLUMNS = [
     ("schedule_steps", 50, True),
     ("tips", 60, True),
     ("materials", 40, True),
+    ("links", 50, True),
 ]
 
 
@@ -72,6 +74,13 @@ def array_or_string_to_cell(value):
     if isinstance(value, list):
         return "\n".join(str(v) for v in value)
     return str(value)
+
+
+def links_to_cell(links):
+    """[{label, url}] → "ラベル | URL" の改行区切り"""
+    if not links:
+        return ""
+    return "\n".join(f"{l.get('label', '')} | {l.get('url', '')}" for l in links)
 
 
 def schedule_to_cells(schedule):
@@ -139,6 +148,7 @@ def main():
             "schedule_steps": sched_steps,
             "tips": array_or_string_to_cell(act.get("tips")),
             "materials": act.get("materials", ""),
+            "links": links_to_cell(act.get("links")),
         }
         for col_idx, (name, _, wrap) in enumerate(COLUMNS, start=1):
             cell = ws.cell(row=row_idx, column=col_idx, value=row_data.get(name, ""))

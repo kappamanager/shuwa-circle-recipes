@@ -728,6 +728,9 @@
   .share-btn.copy   { background: var(--yellow); }
   .share-btn.copy.copied { background: var(--green); color: #fff; }
   .share-btn .icon { font-size: 14px; line-height: 1; }
+  /* 関連資料リンク（シェアボタンと同じ型を流用） */
+  .resource-links { display: flex; flex-wrap: wrap; gap: 10px; }
+  .share-btn.resource { background: var(--blue); color: #fff; font-size: 13.5px; }
   @media (max-width: 540px) {
     .share-bar { gap: 8px; }
     .share-btn { padding: 6px 11px 7px; font-size: 12px; }
@@ -1228,6 +1231,7 @@ function renderModal(a){
         ${scheduleBlock(a.schedule)}
         ${detailBlock('コツ・アレンジ', a.tips)}
         ${detailBlock('準備するもの', a.materials)}
+        ${linksBlock(a.links)}
       </div>
       ${shareBar(a)}
     </div>`;
@@ -1290,6 +1294,16 @@ function scheduleBlock(sched){
     `<div class="schedule-row"><span class="schedule-num">${String(i+1).padStart(2,'0')}</span><span>${escapeHtml(s.label)}</span><span class="schedule-time">${escapeHtml(s.min)}</span></div>`
   ).join('');
   return `<div class="detail-block"><span class="detail-label">タイムスケジュール例</span><div class="schedule"><div class="schedule-head"><span>合計</span><b>${escapeHtml(sched.total)}</b></div>${rows}</div></div>`;
+}
+// 関連資料: [{label, url}]。url はサイト内の相対パス（例: materials/grammar-cards/）か http(s) のみ許可
+function linksBlock(links){
+  if (!Array.isArray(links) || links.length === 0) return '';
+  const items = links
+    .filter(l => l && l.url && (/^https?:\/\//i.test(l.url) || !/^[a-z][a-z0-9+.-]*:/i.test(l.url)))
+    .map(l => `<a class="share-btn resource" href="${escapeHtml(l.url)}" target="_blank" rel="noopener"><span class="icon">📎</span>${escapeHtml(l.label || l.url)}</a>`)
+    .join('');
+  if (!items) return '';
+  return `<div class="detail-block"><span class="detail-label">関連資料</span><div class="resource-links">${items}</div></div>`;
 }
 function escapeHtml(s){
   if (s == null) return '';

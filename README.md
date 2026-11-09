@@ -15,6 +15,7 @@
 | `build.bat` | `build.py` を Windows でダブルクリック実行する用 |
 | `tools/publish.bat` | 手元の作業フォルダからリポジトリへコピーして push する用（下記参照） |
 | `images/`, `robots.txt`, `sitemap.xml` | OGP画像・クローラー向け設定 |
+| `materials/` | 企画から「関連資料」としてリンクするページ（例: `materials/grammar-cards/` 文法カード図鑑） |
 
 `activities.xlsx` はリポジトリに含めない（`.gitignore`）。`data.js` が正本で、xlsx はそこからいつでも作り直せる。
 
@@ -26,12 +27,15 @@
 93_手話サークル企画リスト/
 ├─ 003_site/          ← 編集元（index.html, data.js, activities.xlsx, build.py ...）
 ├─ 004_pages_repo/    ← このリポジトリ
+├─ 006_materials/     ← 資料の編集元（grammar-cards/ = 文法カード図鑑の Excel・生成ツール）
 └─ publish.bat        ← tools/publish.bat と同じもの
 ```
 
 1. `003_site/activities.xlsx` を Excel で編集 → 保存して閉じる
 2. `003_site/build.bat` をダブルクリック（`data.js` が再生成される）
 3. `publish.bat` をダブルクリック（`003_site` の内容をこのリポジトリへコピー → commit → push）
+   - 文法カード図鑑は `006_materials/grammar-cards/web/index.html` が `materials/grammar-cards/` に自動コピーされる
+   - 図鑑を更新するときは `006_materials/grammar-cards/` で Excel を編集 → `python tools/make_web.py` → `publish.bat`
 
 ## PCを入れ替えたとき・リポジトリから復旧するとき
 
@@ -73,7 +77,10 @@
     ]
   },
   tips: ["コツ1", "コツ2"],        // string | string[]
-  materials: "特になし"
+  materials: "特になし",
+  links: [                                    // 省略可。詳細画面に「関連資料」ボタンとして表示
+    { label: "文法カード図鑑", url: "materials/grammar-cards/" }  // サイト内相対パス or http(s)
+  ]
 }
 ```
 
@@ -82,3 +89,4 @@
 - `people` / `design` / `flow` / `tips`: セル内改行で区切ると配列になる（1行なら文字列。`people` と `flow` は常に配列）
 - `schedule_total` と `schedule_steps`: 両方埋めるか両方空（空なら `schedule: null`）
 - `schedule_steps`: 1行1ステップで `5分：ルール説明` の形式
+- `links`: 1行1リンクで `ラベル | URL` の形式（空なら出力しない）

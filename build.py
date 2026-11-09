@@ -22,12 +22,13 @@ XLSX_PATH = os.path.join(HERE, "activities.xlsx")
 COLUMN_ORDER = [
     "id", "title", "catch", "major", "minor", "time", "people", "diff", "prep",
     "purpose", "design", "flow", "schedule_total", "schedule_steps", "tips", "materials",
+    "links",
 ]
 
 # JS リテラル出力時のフィールド順（index.html の既存スタイルに合わせる）
 JS_FIELD_ORDER = [
     "id", "title", "catch", "major", "minor", "time", "people", "diff", "prep",
-    "purpose", "design", "flow", "schedule", "tips", "materials",
+    "purpose", "design", "flow", "schedule", "tips", "materials", "links",
 ]
 
 
@@ -66,6 +67,24 @@ def parse_schedule(total, steps_text):
         steps.append({"label": label, "min": minute})
 
     return {"total": total, "steps": steps}
+
+
+def parse_links(text):
+    """links セル → [{label, url}]。各行 "ラベル | URL"（| が無ければ URL をラベルにも使う）"""
+    if text is None:
+        return []
+    links = []
+    for line in str(text).split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        if "|" in line:
+            label, url = line.rsplit("|", 1)
+            label, url = label.strip(), url.strip()
+        else:
+            label = url = line
+        links.append({"label": label or url, "url": url})
+    return links
 
 
 def js_string(s):
@@ -213,6 +232,10 @@ def load_activities_from_xlsx():
         # flow は空でも配列で揃える（既存スタイルに合わせ）
         if isinstance(act["flow"], str):
             act["flow"] = [act["flow"]] if act["flow"] else []
+        # links は指定がある企画だけ出力する
+        links = parse_links(row_data.get("links"))
+        if links:
+            act["links"] = links
         activities.append(act)
 
     if warnings:
